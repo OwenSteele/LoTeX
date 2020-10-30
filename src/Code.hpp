@@ -18,24 +18,28 @@
 
 using namespace std;
 
+//prototypes
+void CodeMain();
+
 int MenuSelection()
 {
 	string input;
 	stringstream inputSS;
 	int inputI =0;
 
-	cin >> input;
+	input =MsgIn();
 	inputSS << input.substr(0, 1);
 	inputSS >> inputI;
 
 	return inputI;
 }
-void Menu(map<int, pair<function<void()>, string>> dict)
+
+void Menu(map<int, pair<function<void()>, string>> dict, string functionName = "")
 {
 	bool validMenuSelection = false;
 	map<int, pair<function<void()>, string>>::iterator option;
 
-	cout << "\n__Menu__\n";
+	cout << "\n__" << functionName << "() Menu__\n";
 	for (auto it = dict.cbegin(); it != dict.cend(); ++it)
 	{
 		cout <<"   " << it->first << " - " << it->second.second << endl;
@@ -47,7 +51,7 @@ void Menu(map<int, pair<function<void()>, string>> dict)
 		option = dict.find(MenuSelection());
 
 		if (option != dict.end()) validMenuSelection = true;
-		else ErrMsg("Invalid input, please try again");
+		else cout << "INPUT_ERR: Invalid input, please try again";
 
 	} while (!validMenuSelection);
 
@@ -81,16 +85,42 @@ void NewFile()
 		SysMsg(msg);
 	}
 	else ErrMsg("File could not be created.");
-
 }
+
+void FileEditing()
+{
+	string fileToOpen;
+	do
+	{
+		cout << "Enter file name";
+
+		string temp = MsgIn();
+		if (temp == "!!BREAK") CodeMain();
+		else fileToOpen = temp;
+
+		if (FileExists(fileToOpen)) break;
+		else ErrMsg("Not found, try again - ");
+	} while (true);
+	
+	ofstream exFile ;
+	exFile.open (fileToOpen);
+	exFile.close();
+	SysMsg("File Closed.");
+}
+
 
 void CodeMain()
 {
-    //init here.
-    map<int, pair<function<void()>, string>> mainMenuDict;
-	mainMenuDict.insert(make_pair(0, make_pair(&Exit, "Exit")));
-	mainMenuDict.insert(make_pair(1, make_pair(&NewFile, "Create new file")));
-    Menu(mainMenuDict);
+	do{
+		//init here.
+    	map<int, pair<function<void()>, string>> mainMenuDict;
+
+		mainMenuDict.insert(make_pair(0, make_pair(&Exit, "Exit")));
+		mainMenuDict.insert(make_pair(1, make_pair(&NewFile, "Create new file")));
+		mainMenuDict.insert(make_pair(2, make_pair(&FileEditing, "Open File")));
+
+		Menu(mainMenuDict, __FUNCTION__);
+	}while(true);
 
     cin.get();
 }

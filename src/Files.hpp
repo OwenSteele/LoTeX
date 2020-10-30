@@ -74,12 +74,24 @@ class LFile
         return false;
     }
 };
+
+inline string CorrectPathName(string& fullPath)
+{
+    if(fullPath.substr(0,1)=="/") fullPath = fullPath.substr(1);
+    if(fullPath.substr(fullPath.length()-4,4)==".txt") fullPath += ".txt";
+    return fullPath;
+}
 void CreateFile(string& fullPath)
 {
+    fullPath = CorrectPathName(fullPath);
     ofstream outFile (fullPath);
+    outFile << "test";
     outFile.close();
 }
-inline bool FileExists (const string& fullPath) {
-  struct stat buffer;   
-  return (stat (fullPath.c_str(), &buffer) == 0); 
+inline bool FileExists (const string& fullPath) 
+{
+    string path = fullPath;
+    path = CorrectPathName(path);
+    struct stat buffer;   
+    return (stat (path.c_str(), &buffer) == 0); 
 }
