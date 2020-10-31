@@ -12,12 +12,12 @@ class LFile
     {
         if (upper == -1)
         {
-            if (lower > 0 && lower < sizeof(content)) return true;
+            if (lower > 0 && lower < content.size()) return true;
             else ErrMsg("Value is outside of file line range.");
         }
         else
         {
-            if(lower > 0 && lower < sizeof(content) && upper > 0 && upper < sizeof(content))
+            if(lower > 0 && lower < content.size() && upper > 0 && upper < sizeof(content))
             {
                 if (lower < upper) return true;
                 else ErrMsg("First value must be lower than the second."); 
@@ -26,12 +26,16 @@ class LFile
         }
         return false;
     }
-    vector<string> GetFileContent (string& fullPath)
+    static vector<string> GetFileContent (string& fullPath)
     {
         vector<string> content;
+        string currentLine;
         ifstream exFile;
 	    exFile.open (fullPath, ios_base::app);
-
+        while (getline(exFile, currentLine))
+        {
+            content.push_back(currentLine);
+        }
 	    exFile.close();
 
         return content;
@@ -41,14 +45,14 @@ class LFile
     string name;
     string path;
 
-    LFile(string fullPath, bool newFile = false)
+    explicit LFile(string fullPath, bool newFile = false)
     {
         int lastSlashPos = fullPath.rfind("/");
         path = CorrectPathName(fullPath);
         name = path.substr(lastSlashPos,path.length()-lastSlashPos); //name = after last '/' in path
         if(!newFile) content = GetFileContent(path);
     }
-    int lineCount()
+    const int lineCount()
     {
         return content.size();
     }
@@ -65,7 +69,7 @@ class LFile
             vector<string> lines;
             for(int n = lower; n <= upper; n++)
             {
-                string newLine = n + ": " + content[n];
+                string newLine = to_string(n) + ": " + content[n];
                 lines.push_back(newLine);
             }
             return lines;
@@ -85,14 +89,7 @@ inline string CorrectPathName(string& fullPath)
 void CreateFile(string& fullPath)
 {
     fullPath = CorrectPathName(fullPath);
-    ofstream outFile (fullPath);
+    ofstream outFile (fullPath, ios_base::app);
     outFile << "test";
     outFile.close();
-}
-inline bool FileExists (const string& fullPath) 
-{
-    string path = fullPath;
-    path = CorrectPathName(path);
-    struct stat buffer;   
-    return (stat (path.c_str(), &buffer) == 0); 
 }

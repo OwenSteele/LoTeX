@@ -55,7 +55,8 @@ void FileEditing()
 			if (temp == "!!BREAK") CodeMain();
 			else fullPath= temp;
 
-			if (FileExists(fullPath)) break;
+			fullPath = CorrectPathName(fullPath);
+			if (CheckPathExists(fullPath)) break;
 			else ErrMsg("Not found, try again - ");
 		} while (true);
 	}
