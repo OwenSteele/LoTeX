@@ -1,59 +1,14 @@
-#include <iostream>
-#include <fstream>
-#include <sys/stat.h>
-#include <string.h>
-#include <map>
-#include <sstream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <string>
-#include <functional>
-#include <map>
-#include <memory>
+
 
 #include "SrcFiles.h"
 
 using namespace std;
 
+//prototypes
+inline string CorrectPathName(string& fullPath);
+
 class LFile
 {
-    //properties
-    public:
-    string name;
-    string path;
-
-    private:
-    vector<string> content;
-
-    //constructor
-    public:
-
-
-    //functions
-    string EditLine(int n)
-    {
-        if (CheckRange(n))
-            return content[n];
-    }
-    vector<string> ViewLines(int lower, int upper)
-    {
-        if(CheckRange(lower,upper))
-        {
-            vector<string> lines;
-            for(int n = lower; n <= upper; n++)
-            {
-                string newLine = n + ": " + content[n];
-                lines.push_back(newLine);
-            }
-            return lines;
-        }
-    }
-    bool CheckPath(string path)
-    {
-        return true;
-    }
-
     private:
     bool CheckRange(int lower, int upper = -1)
     {
@@ -73,12 +28,62 @@ class LFile
         }
         return false;
     }
+    vector<string> GetFileContent (string& fullPath)
+    {
+        vector<string> content;
+        ifstream exFile;
+	    exFile.open (fullPath, ios_base::app);
+
+	    exFile.close();
+
+        return content;
+    }
+
+    public:
+    vector<string> content;
+    string name;
+    string path;
+
+    LFile(string fullPath, bool newFile = false)
+    {
+        int lastSlashPos = fullPath.rfind("/");
+        path = CorrectPathName(fullPath);
+        name = path.substr(lastSlashPos,path.length()-lastSlashPos); //name = after last '/' in path
+        if(!newFile) content = GetFileContent(path);
+    }
+    int lineCount()
+    {
+        return content.size();
+    }
+
+    string EditLine(int n)
+    {
+        if (CheckRange(n))
+            return content[n];
+    }
+    vector<string> ViewLines(int lower, int upper)
+    {
+        if(CheckRange(lower,upper))
+        {
+            vector<string> lines;
+            for(int n = lower; n <= upper; n++)
+            {
+                string newLine = n + ": " + content[n];
+                lines.push_back(newLine);
+            }
+            return lines;
+        }
+    }
 };
 
+bool CheckPathExists(const filesystem::path& dirPath, filesystem::file_status status = filesystem::file_status{})
+    {
+        if(filesystem::status_known(status) ? filesystem::exists(status) : filesystem::exists(dirPath)) return true;
+        return false;
+    }    
 inline string CorrectPathName(string& fullPath)
 {
-    if(fullPath.substr(0,1)=="/") fullPath = fullPath.substr(1);
-    if(fullPath.substr(fullPath.length()-4,4)==".txt") fullPath += ".txt";
+    if(fullPath.substr(0,1)!="/") return "/" + fullPath;
     return fullPath;
 }
 void CreateFile(string& fullPath)

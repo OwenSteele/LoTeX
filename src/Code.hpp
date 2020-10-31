@@ -1,19 +1,3 @@
-#include <iostream>
-#include <string.h>
-#include <map>
-#include <sstream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <iostream>
-#include <string>
-#include <functional>
-#include <map>
-#include <memory>
-#include <numeric>
-#include <chrono>
-#include <ctime> 
-
 #include "SrcFiles.h"
 
 using namespace std;
@@ -34,7 +18,7 @@ int MenuSelection()
 	return inputI;
 }
 
-void Menu(map<int, pair<function<void()>, string>> dict, string functionName = "")
+void Menu(map<int, pair<function<void()>, string>> dict, const string& functionName = "")
 {
 	bool validMenuSelection = false;
 	map<int, pair<function<void()>, string>>::iterator option;
@@ -44,7 +28,7 @@ void Menu(map<int, pair<function<void()>, string>> dict, string functionName = "
 	{
 		cout <<"   " << it->first << " - " << it->second.second << endl;
 	}
-	cout << "Press a key and press enter: ";
+	cout << "Press a key and press enter";
 
 	do
 	{
@@ -58,56 +42,75 @@ void Menu(map<int, pair<function<void()>, string>> dict, string functionName = "
 	option->second.first();
 }
 
+string fileEditFullPath;
+void FileEditing()
+{
+	string fullPath;
+	if (fileEditFullPath.empty())
+	{
+	do
+		{
+			cout << "Enter file name and path";
+
+			string temp = MsgIn();
+			if (temp == "!!BREAK") CodeMain();
+			else fullPath= temp;
+
+			if (FileExists(fullPath)) break;
+			else ErrMsg("Not found, try again - ");
+		} while (true);
+	}
+	else 
+	{
+		fullPath = fileEditFullPath;
+		fileEditFullPath="";
+	}
+	
+	LFile currentFile(fullPath);
+
+	SysMsg("Reading from file:", currentFile.path, " - lines: ", to_string(currentFile.lineCount()));
+	for(const string& line : currentFile.content)
+	cout << line;
+}
 void NewFile()
 {
-	LFile currentFile;
 	string msg;
+	string nameInput;
 	string pathInput;
 	string fullPath;
 
-    SysMsg(__FUNCTION__);
-
+    SysMsg(__FUNCTION__,"()");
     cout << "Please enter a file name, and press enter";
-    currentFile.name = MsgIn();
-	cout << "Please enter a path name (typing only '/' will set it as the current program directory), and press enter";
+    nameInput = MsgIn();
+	SysMsg(filesystem::current_path(), " = '/'");
+	cout << "Please enter a path name, and press enter";
 	pathInput = MsgIn();
-    if(currentFile.CheckPath(pathInput))
+	pathInput = CorrectPathName(pathInput);
+
+    if(CheckPathExists(pathInput))
 	{
 		if (pathInput.substr(pathInput.length()-1,1)!="/") pathInput.append("/");
-		fullPath = pathInput + currentFile.name + ".txt";
-		SysMsg(fullPath);
+		fullPath = pathInput + nameInput + ".txt";
+		SysMsg("Creating file: ",fullPath);
 		CreateFile(fullPath);
 	}
+	else SysMsg("Path not found.");
 
-	if(FileExists(fullPath))
+	LFile currentFile(fullPath, true);
+
+	if(CheckPathExists(fullPath))
 	{
-		 msg = "File Created Successfully '" + currentFile.name + ".txt'";
-		SysMsg(msg);
+		SysMsg("File Created Successfully '", currentFile.name,"'");
+		cout << "Edit this file now (yes/no)?";
+		if (MsgIn().substr(0,1) == "y")
+		{
+			fileEditFullPath = currentFile.path;
+			FileEditing();
+		} 
 	}
 	else ErrMsg("File could not be created.");
+
 }
-
-void FileEditing()
-{
-	string fileToOpen;
-	do
-	{
-		cout << "Enter file name";
-
-		string temp = MsgIn();
-		if (temp == "!!BREAK") CodeMain();
-		else fileToOpen = temp;
-
-		if (FileExists(fileToOpen)) break;
-		else ErrMsg("Not found, try again - ");
-	} while (true);
-	
-	ofstream exFile ;
-	exFile.open (fileToOpen);
-	exFile.close();
-	SysMsg("File Closed.");
-}
-
 
 void CodeMain()
 {

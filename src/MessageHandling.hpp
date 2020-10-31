@@ -1,7 +1,3 @@
-#include <string.h>
-#include <iostream>
-#include <vector>
-
 #include "SrcFiles.h"
 
 using namespace std;
@@ -16,11 +12,11 @@ void Exit()
 
 void ErrMsg(string message) 
 {
-    cout << "\n  --!ERR >> '" << message << "'" << endl;
+    cout << "\n  --!ERR >> '" << message << "'" << endl << endl;
 }
-void SysMsg(string message)
+void SysMsg(string m, string m2 = "",string m3 = "",string m4 = "",string m5 = "",string m6 = "",string m7 = "") //cleanup
 {
-    cout << "\n  --!SYS >> '" << message << "'" << endl;
+    cout << "\n  --!SYS >> '" << m << m2 << m3 << m4 << m5 << m6 << m7 <<"'" << endl << endl;
 }
 string MsgIn()
     {
