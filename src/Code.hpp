@@ -114,7 +114,7 @@ void NewFile()
 
 void CodeMain()
 {
-	do{
+	while(!exitCalled){
 		//init here.
     	map<int, pair<function<void()>, string>> mainMenuDict;
 
@@ -123,9 +123,8 @@ void CodeMain()
 		mainMenuDict.insert(make_pair(2, make_pair(&FileEditing, "Open File")));
 
 		Menu(mainMenuDict, __FUNCTION__);
-	}while(true);
-
-    cin.get();
+	}
+	exit(0);
 }
 
 

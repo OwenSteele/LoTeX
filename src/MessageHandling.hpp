@@ -3,11 +3,13 @@
 using namespace std;
 
 const vector<string> knownCommands = {"'###' = Exit program.", "'#h' = Show Help", "'#b' = break out of current area."};
+bool exitCalled = false;
+void CodeMain();
 
 void Exit()
 {
     //add message?
-    exit; //no exit yet
+    exitCalled = true;
 }
 
 void ErrMsg(string message) 
@@ -28,7 +30,11 @@ string MsgIn()
             cin >> input; //aim to have only cin in program here
 
             //check for known cmds
-            if (input == "###") Exit(); //always check if program exit is called
+            if (input == "###") 
+            {
+                Exit();
+                CodeMain();
+                } //always check if program exit is called
             else if (input == "#h")
             {
                 SysMsg("___HELP - COMMANDS___");
