@@ -5,5 +5,4 @@ class Sample {
     Sample() = default;
 };
 
-
 #endif //SAMPLE_HPP

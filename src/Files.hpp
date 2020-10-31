@@ -1,5 +1,4 @@
-
-
+#include <functional>
 #include "SrcFiles.h"
 
 using namespace std;
