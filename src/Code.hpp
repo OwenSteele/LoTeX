@@ -68,9 +68,9 @@ void FileEditing()
 	
 	LFile currentFile(fullPath);
 
-	SysMsg("Reading from file:", currentFile.path, " - lines: ", to_string(currentFile.lineCount()));
-	for(const string& line : currentFile.content)
-	cout << line;
+	SysMsg("Reading from file: ~", currentFile.path, " - lines: ", to_string(currentFile.LineCount()));
+	
+	currentFile.ViewLines();
 }
 void NewFile()
 {

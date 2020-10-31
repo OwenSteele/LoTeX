@@ -4,6 +4,7 @@ using namespace std;
 
 //prototypes
 inline string CorrectPathName(string& fullPath);
+int LineCount();
 
 class LFile
 {
@@ -12,12 +13,12 @@ class LFile
     {
         if (upper == -1)
         {
-            if (lower > 0 && lower < content.size()) return true;
+            if (lower > 0 && lower < LineCount()) return true;
             else ErrMsg("Value is outside of file line range.");
         }
         else
         {
-            if(lower > 0 && lower < content.size() && upper > 0 && upper < sizeof(content))
+            if(lower >= 0 && lower < LineCount() && upper > 0 && upper <= LineCount())
             {
                 if (lower < upper) return true;
                 else ErrMsg("First value must be lower than the second."); 
@@ -52,7 +53,7 @@ class LFile
         name = path.substr(lastSlashPos,path.length()-lastSlashPos); //name = after last '/' in path
         if(!newFile) content = GetFileContent(path);
     }
-    const int lineCount()
+    int LineCount()
     {
         return content.size();
     }
@@ -62,18 +63,22 @@ class LFile
         if (CheckRange(n))
             return content[n];
     }
-    vector<string> ViewLines(int lower, int upper)
+    void ViewLines(int lower = -1, int upper = -1)
     {
+        if(lower == -1 && upper == -1)
+        {
+           lower = 0;
+           upper = LineCount(); 
+        }
+
         if(CheckRange(lower,upper))
         {
-            vector<string> lines;
+            cout << "___Starting ifstream:___" << endl;
             for(int n = lower; n <= upper; n++)
-            {
-                string newLine = to_string(n) + ": " + content[n];
-                lines.push_back(newLine);
-            }
-            return lines;
-        }
+                cout << to_string(n) + ": " + content[n] << endl;
+
+            cout << "___Ending ifstream:___" << endl;
+        } 
     }
 };
 bool CheckPathExists(const filesystem::path& dirPath, filesystem::file_status status = filesystem::file_status{})
