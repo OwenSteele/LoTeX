@@ -1,4 +1,3 @@
-#include <functional>
 #include "SrcFiles.h"
 
 using namespace std;
@@ -37,7 +36,6 @@ class LFile
 
         return content;
     }
-
     public:
     vector<string> content;
     string name;
@@ -74,7 +72,6 @@ class LFile
         }
     }
 };
-
 bool CheckPathExists(const filesystem::path& dirPath, filesystem::file_status status = filesystem::file_status{})
     {
         if(filesystem::status_known(status) ? filesystem::exists(status) : filesystem::exists(dirPath)) return true;

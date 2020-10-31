@@ -29,7 +29,6 @@ void Menu(map<int, pair<function<void()>, string>> dict, const string& functionN
 		cout <<"   " << it->first << " - " << it->second.second << endl;
 	}
 	cout << "Press a key and press enter";
-
 	do
 	{
 		option = dict.find(MenuSelection());

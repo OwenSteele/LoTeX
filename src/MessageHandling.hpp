@@ -7,7 +7,7 @@ const vector<string> knownCommands = {"'###' = Exit program.", "'#h' = Show Help
 void Exit()
 {
     //add message?
-    exit;
+    exit; //no exit yet
 }
 
 void ErrMsg(string message) 
