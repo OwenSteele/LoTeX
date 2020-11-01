@@ -15,5 +15,5 @@ CMake is required to build and run this project. The following commands can be r
 >> cd build
 >> cmake ..
 >> cmake --build .
->> ./MyAppName_run
+>> ./lotex_run
 ```
