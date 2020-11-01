@@ -17,9 +17,7 @@ inline string CorrectPathName(string& fullPath)
 }
 void CreateFile(string& fullPath)
 {
-    fullPath = CorrectPathName(fullPath);
     ofstream outFile (fullPath, ios_base::app);
-    outFile << "test";
     outFile.close();
 }
 
@@ -58,6 +56,17 @@ class LFile
 
         return content;
     }
+    string HTMLStartEnd(bool start = true)
+    {
+        if(start)
+        {
+            string p1 = "<!DOCTYPE html>\n<html>\n<head>\n<title>";
+            string p2 = "</title>\n</head>\n<body>\n";
+            return p1 + name.substr(0,name.rfind(".")) + p2;
+        }
+        return "\n</body>\n</html>";
+    }
+
     public:
     vector<string> content;
     string name;
@@ -67,8 +76,8 @@ class LFile
     {
         int lastSlashPos = fullPath.rfind("/");
         path = CorrectPathName(fullPath).substr(0,lastSlashPos);
-        name = path.substr(lastSlashPos,path.length()-lastSlashPos); //name = after last '/' in path
-        if(!newFile) content = GetFileContent(path);
+        name = fullPath.substr(lastSlashPos+1,fullPath.length()-lastSlashPos); //name = after last '/' in path
+        if(!newFile) content = GetFileContent(fullPath);
     }
     int LineCount()
     {
@@ -77,8 +86,8 @@ class LFile
 
     string EditLine(int n)
     {
-        if (CheckRange(n))
-            return content[n];
+        if (CheckRange(n)) return content[n];
+        return "Line not found.";
     }
     void ViewLines(int lower = -1, int upper = -1)
     {
@@ -97,13 +106,23 @@ class LFile
             cout << "___Ending ifstream:___" << endl;
         } 
     }
-    void PublishFile(string inputPath = "***")
+    void Publish()
     {
-        if (inputPath == "***") inputPath = path;
-        else 
-        {
-            inputPath = CorrectPathName(inputPath);
-            if(!CheckPathExists(inputPath)) ErrMsg("Path not found.");
-        }
+        string publishedFullPath = path +"/"+ name.substr(0,name.rfind(".")) + ".html";
+                
+                if(!CheckPathExists(publishedFullPath)) CreateFile(publishedFullPath);
+
+                ofstream pubFile; 
+                pubFile.open (publishedFullPath, ios_base::app);
+                pubFile << HTMLStartEnd();
+                pubFile << "<a>test</a>";
+                for (string line : content)
+                {
+                    pubFile << line;
+                }
+                pubFile << HTMLStartEnd(false);
+                pubFile.close();
+
+                SysMsg("html file published successfully - Location: '", publishedFullPath, "'.");        
     }
 };

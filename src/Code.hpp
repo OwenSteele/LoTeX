@@ -42,7 +42,7 @@ void Menu(map<int, pair<function<void()>, string>> dict, const string& functionN
 }
 
 string fileEditFullPath;
-void FileEditing()
+LFile FileEditing()
 {
 	string fullPath;
 	if (fileEditFullPath.empty())
@@ -68,9 +68,22 @@ void FileEditing()
 	
 	LFile currentFile(fullPath);
 
+	SysMsg("File '", fullPath, "' found successfully!");
+
+	return currentFile;
+}
+void FileView()
+{
+	LFile currentFile = FileEditing();
 	SysMsg("Reading from file: ~", currentFile.path, currentFile.name, " - lines: ", to_string(currentFile.LineCount()));
 	
 	currentFile.ViewLines();
+}
+void FilePublish()
+{
+	LFile currentFile = FileEditing();
+
+	currentFile.Publish();
 }
 void NewFile()
 {
@@ -89,7 +102,6 @@ void NewFile()
 
     if(CheckPathExists(pathInput))
 	{
-		if (pathInput.substr(pathInput.length()-1,1)!="/") pathInput.append("/");
 		fullPath = pathInput + nameInput + ".txt";
 		SysMsg("Creating file: ",fullPath);
 		CreateFile(fullPath);
@@ -119,7 +131,9 @@ void CodeMain()
 
 		mainMenuDict.insert(make_pair(0, make_pair(&Exit, "Exit")));
 		mainMenuDict.insert(make_pair(1, make_pair(&NewFile, "Create new file")));
-		mainMenuDict.insert(make_pair(2, make_pair(&FileEditing, "Open File")));
+		mainMenuDict.insert(make_pair(2, make_pair(&FileView, "Open file")));
+		mainMenuDict.insert(make_pair(3, make_pair(&FilePublish, "Publish existing file")));
+
 
 		Menu(mainMenuDict, __FUNCTION__);
 	}
