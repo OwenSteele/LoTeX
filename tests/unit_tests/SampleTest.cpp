@@ -1,5 +1,4 @@
 #include "gtest/gtest.h"
-#include <Sample.hpp>
 
 using namespace std;
 

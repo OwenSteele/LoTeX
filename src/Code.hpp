@@ -68,7 +68,7 @@ void FileEditing()
 	
 	LFile currentFile(fullPath);
 
-	SysMsg("Reading from file: ~", currentFile.path, " - lines: ", to_string(currentFile.LineCount()));
+	SysMsg("Reading from file: ~", currentFile.path, currentFile.name, " - lines: ", to_string(currentFile.LineCount()));
 	
 	currentFile.ViewLines();
 }
@@ -115,7 +115,6 @@ void NewFile()
 void CodeMain()
 {
 	while(!exitCalled){
-		//init here.
     	map<int, pair<function<void()>, string>> mainMenuDict;
 
 		mainMenuDict.insert(make_pair(0, make_pair(&Exit, "Exit")));
@@ -125,7 +124,4 @@ void CodeMain()
 		Menu(mainMenuDict, __FUNCTION__);
 	}
 	exit(0);
-}
-
-
-    
+}  

@@ -3,6 +3,7 @@
 using namespace std;
 
 const vector<string> knownCommands = {"'###' = Exit program.", "'#h' = Show Help", "'#b' = break out of current area."};
+
 bool exitCalled = false;
 void CodeMain();
 

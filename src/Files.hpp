@@ -3,8 +3,25 @@
 using namespace std;
 
 //prototypes
-inline string CorrectPathName(string& fullPath);
 int LineCount();
+
+bool CheckPathExists(const filesystem::path& dirPath, filesystem::file_status status = filesystem::file_status{})
+    {
+        if(filesystem::status_known(status) ? filesystem::exists(status) : filesystem::exists(dirPath)) return true;
+        return false;
+    }    
+inline string CorrectPathName(string& fullPath)
+{
+    if(fullPath.substr(0,1)!="/") return "/" + fullPath;
+    return fullPath;
+}
+void CreateFile(string& fullPath)
+{
+    fullPath = CorrectPathName(fullPath);
+    ofstream outFile (fullPath, ios_base::app);
+    outFile << "test";
+    outFile.close();
+}
 
 class LFile
 {
@@ -49,7 +66,7 @@ class LFile
     explicit LFile(string fullPath, bool newFile = false)
     {
         int lastSlashPos = fullPath.rfind("/");
-        path = CorrectPathName(fullPath);
+        path = CorrectPathName(fullPath).substr(0,lastSlashPos);
         name = path.substr(lastSlashPos,path.length()-lastSlashPos); //name = after last '/' in path
         if(!newFile) content = GetFileContent(path);
     }
@@ -80,21 +97,13 @@ class LFile
             cout << "___Ending ifstream:___" << endl;
         } 
     }
-};
-bool CheckPathExists(const filesystem::path& dirPath, filesystem::file_status status = filesystem::file_status{})
+    void PublishFile(string inputPath = "***")
     {
-        if(filesystem::status_known(status) ? filesystem::exists(status) : filesystem::exists(dirPath)) return true;
-        return false;
-    }    
-inline string CorrectPathName(string& fullPath)
-{
-    if(fullPath.substr(0,1)!="/") return "/" + fullPath;
-    return fullPath;
-}
-void CreateFile(string& fullPath)
-{
-    fullPath = CorrectPathName(fullPath);
-    ofstream outFile (fullPath, ios_base::app);
-    outFile << "test";
-    outFile.close();
-}
+        if (inputPath == "***") inputPath = path;
+        else 
+        {
+            inputPath = CorrectPathName(inputPath);
+            if(!CheckPathExists(inputPath)) ErrMsg("Path not found.");
+        }
+    }
+};
