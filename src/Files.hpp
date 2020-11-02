@@ -165,6 +165,8 @@ class LFile
     }
     string FormatHTML(string line)
     {
+        if (line.empty()) return "</br>";
+
         string styleName;
             
         if (line.substr(0,1) != "/") styleName = "text";
@@ -175,11 +177,11 @@ class LFile
         string pStart = "\n<" + s.element + " class=\"" + s.name + "\"" + ">";
         string pContent;
         if (line.substr(0,1) != "/") pContent = line;
-        else if (line.find(" ") != string::npos) pContent = line.substr(line.find(" ",1), line.length());
+        else if (line.find(" ") != string::npos) pContent = line.substr(line.find(" ",1)+1, line.length());
         
-        string pEnd = "</" + s.element + ">\n";
+        string pEnd = "</" + s.element + ">";
 
-        return pStart + pContent + pEnd + ((s.element == "a" ) ? "<br>" : "");
+        return pStart + pContent + pEnd;
     }
     void Publish()
     {
