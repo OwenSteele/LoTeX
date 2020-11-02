@@ -105,23 +105,22 @@ void NewFile()
 		fullPath = pathInput + nameInput + ".txt";
 		SysMsg("Creating file: ",fullPath);
 		CreateFile(fullPath);
+		
+		LFile currentFile(fullPath, true);
+
+		if(CheckPathExists(fullPath))
+		{
+			SysMsg("File Created Successfully '", currentFile.name,"'");
+			cout << "Edit this file now (yes/no)?";
+			if (MsgIn().substr(0,1) == "y")
+			{
+				fileEditFullPath = currentFile.path;
+				FileEditing();
+			} 
+		}
+		else ErrMsg("File could not be created.");
 	}
 	else SysMsg("Path not found.");
-
-	LFile currentFile(fullPath, true);
-
-	if(CheckPathExists(fullPath))
-	{
-		SysMsg("File Created Successfully '", currentFile.name,"'");
-		cout << "Edit this file now (yes/no)?";
-		if (MsgIn().substr(0,1) == "y")
-		{
-			fileEditFullPath = currentFile.path;
-			FileEditing();
-		} 
-	}
-	else ErrMsg("File could not be created.");
-
 }
 
 void CodeMain()
@@ -133,7 +132,6 @@ void CodeMain()
 		mainMenuDict.insert(make_pair(1, make_pair(&NewFile, "Create new file")));
 		mainMenuDict.insert(make_pair(2, make_pair(&FileView, "Open file")));
 		mainMenuDict.insert(make_pair(3, make_pair(&FilePublish, "Publish existing file")));
-
 
 		Menu(mainMenuDict, __FUNCTION__);
 	}

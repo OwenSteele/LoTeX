@@ -121,7 +121,7 @@ class LFile
     }
     string CreateCSS(Styles s)
     {
-        string pStart = s.name + " {\n";
+        string pStart = "." + s.name + " {\n";
 
         //automate to generic list of Styles properties
         string pC = GetPropertyName(Styles, s.color);
@@ -134,42 +134,56 @@ class LFile
         pFS = ReplaceUnderscore(pFS.substr(pFS.find(".",0)+1,pFS.length())) + ": " + to_string(s.font_size) + "px" + ";\n";
         
         string pContent = pC + pBC + pFF + pFS;
-        string pEnd = "\n}";
+        string pEnd = "}\n";
 
         return pStart + pContent + pEnd;
     }
+    vector<string> existingStyles;
     string FormatCSS(string line)
     {
-        vector<Styles> styles = DefaultStyles();
+        vector<Styles> styles = GetDefaultStyles();
         string formattedLine;
-            if (line.substr(0,1) == "/")
-            {
-                string styleName = line.substr(1,line.find(" ",1)-1);
-                auto it = find_if(styles.begin(), styles.end(), [&styleName](const Styles& obj) {return obj.name == styleName;});
-                if (it != styles.end())
-                {
-                    Styles s = styles[distance(styles.begin(), it)];
-                    formattedLine = CreateCSS(s);
-                }
-                else ErrMsg("Line: '", line, "' command: '", styleName, "' not recognised.");
-            }
-            else
-            {
+        string styleName;
+            
+        if (line.substr(0,1) != "/") styleName = "text";
+        else styleName = line.substr(1,line.find(" ",1)-1);
                 
+        Styles s = GetStyleByName(styleName);
+        if (s.name != "")
+        {
+            string currentStyleName = s.name;
+            auto it = find_if(
+                existingStyles.begin(), existingStyles.end(),
+                 [&currentStyleName] (const string& eS) {return eS == currentStyleName;});
+            if (it == existingStyles.end())
+            {
+                existingStyles.push_back(currentStyleName);                        formattedLine = CreateCSS(s);
             }
-            return formattedLine;
+        }
+        else ErrMsg("Line: '", line, "' command: '", styleName, "' not recognised."); //create add new style option here
+        return formattedLine;
     }
     string FormatHTML(string line)
     {
-        string formattedLine;
-            if (line.substr(0,1) == "/")
-            {
-                return "";
-            }
-            else return "" ;
+        string styleName;
+            
+        if (line.substr(0,1) != "/") styleName = "text";
+        else styleName = line.substr(1,line.find(" ",1)-1);
+        
+        Styles s = GetStyleByName(styleName);
+
+        string pStart = "\n<" + s.element + " class=\"" + s.name + "\"" + ">";
+        string pContent;
+        if (line.find(" ") != string::npos) pContent = line.substr(line.find(" ",1), line.length());
+        else if (line.substr(0,1) != "/") pContent = line;
+        string pEnd = "</" + s.element + ">\n";
+
+        return pStart + pContent + pEnd + ((s.element == "a" ) ? "<br>" : "");
     }
     void Publish()
     {
+        CreateDefaultStyles();
+
         string publishedFullPath = path +"/"+ name.substr(0,name.rfind(".")) + ".html";
                 
                 if(!CheckPathExists(publishedFullPath)) CreateFile(publishedFullPath);

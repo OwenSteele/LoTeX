@@ -23,21 +23,43 @@ class Styles
     }
 };
 
+inline vector<Styles> defaultStyles;
 
-vector<Styles> DefaultStyles()
+vector<Styles> GetDefaultStyles() {return defaultStyles;}
+
+inline Styles *normalText = new Styles("text","p","black","white","Arial",12);
+
+void CreateDefaultStyles()
 {
-    vector<Styles> defaultStyles;
-
-    Styles *title = new Styles("title","h1","black","white","Arial",20);
+    if (defaultStyles.size() == 0)
+    { 
+    defaultStyles.push_back(*normalText);
+    Styles *title = new Styles("title","h1","black","white","Arial",32);
     defaultStyles.push_back(*title);
-    Styles *subtitle = new Styles("subtitle","h2","black","white","Arial",16);
+    Styles *subtitle = new Styles("subtitle","h2","black","white","Arial",20);
     defaultStyles.push_back(*subtitle);
-    Styles *text = new Styles("text","h1","black","white","Arial",12);
-    defaultStyles.push_back(*text);
-    Styles *redText = new Styles("red","h1","red","white","Arial",12);
+    Styles *redText = new Styles("red","p","red","white","Arial",12);
     defaultStyles.push_back(*redText);
-    Styles *highlightedText = new Styles("highlight","h1","white","red","Arial",12);
+    Styles *highlightedText = new Styles("highlight","p","white","red","Arial",12);
     defaultStyles.push_back(*highlightedText);
+    }
+}
 
-    return defaultStyles;
+bool StyleExists(string styleName)
+{
+    auto it = find_if(defaultStyles.begin(), defaultStyles.end(), [&styleName](const Styles& obj) {return obj.name == styleName;}); //find if style exists
+    if (it != defaultStyles.end())
+    {
+        return true;
+    }
+    else return false;                                 
+}
+Styles GetStyleByName(string styleName)
+{
+    if (StyleExists(styleName))
+    {
+        auto it = find_if(defaultStyles.begin(), defaultStyles.end(), [&styleName] (const Styles& obj) {return obj.name == styleName;});
+        return defaultStyles[distance(defaultStyles.begin(), it)];
+    }
+    else return *normalText;
 }
