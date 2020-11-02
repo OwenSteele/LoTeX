@@ -22,6 +22,8 @@ class Styles
         font_size = _font_size;
     }
 };
+
+
 vector<Styles> DefaultStyles()
 {
     vector<Styles> defaultStyles;

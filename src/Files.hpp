@@ -4,6 +4,7 @@ using namespace std;
 
 //prototypes
 int LineCount();
+#define GetPropertyName(ClassName, PropertyName) #PropertyName
 
 bool CheckPathExists(const filesystem::path& dirPath, filesystem::file_status status = filesystem::file_status{})
     {
@@ -56,14 +57,15 @@ class LFile
 
         return content;
     }
-    string HTMLStartEnd(bool start = true)
+    string HTMLSection(int section)
     {
-        if(start)
+        if(section == 0)
         {
             string p1 = "<!DOCTYPE html>\n<html>\n<head>\n<title>";
-            string p2 = "</title>\n</head>\n<body>\n";
+            string p2 = "</title>\n<style>";
             return p1 + name.substr(0,name.rfind(".")) + p2;
         }
+        else if (section == 1) return "</style></head>\n<body>\n";
         return "\n</body>\n</html>";
     }
 
@@ -106,6 +108,66 @@ class LFile
             cout << "___Ending ifstream:___" << endl;
         } 
     }
+    vector<Styles> addedStyles;
+    string ReplaceUnderscore(string text)
+    {
+        if (text.find("_")!= string::npos)
+        {
+            string p1 = text.substr(0,text.find("_"));
+            string p2 = text.substr(text.find("_")+1, text.length());
+            return p1 + "-" + p2;
+        }
+        else return text;
+    }
+    string CreateCSS(Styles s)
+    {
+        string pStart = s.name + " {\n";
+
+        //automate to generic list of Styles properties
+        string pC = GetPropertyName(Styles, s.color);
+        pC = ReplaceUnderscore(pC.substr(pC.find(".",0)+1,pC.length())) + ": " + s.color + ";\n";
+        string pBC = GetPropertyName(Styles, s.background_color);
+        pBC = ReplaceUnderscore(pBC.substr(pBC.find(".",0)+1,pBC.length())) + ": " + s.background_color + ";\n";
+        string pFF = GetPropertyName(Styles, s.font_family);
+        pFF = ReplaceUnderscore(pFF.substr(pFF.find(".",0)+1,pFF.length())) + ": " + s.font_family + ";\n";
+        string pFS = GetPropertyName(Styles, s.font_size);
+        pFS = ReplaceUnderscore(pFS.substr(pFS.find(".",0)+1,pFS.length())) + ": " + to_string(s.font_size) + "px" + ";\n";
+        
+        string pContent = pC + pBC + pFF + pFS;
+        string pEnd = "\n}";
+
+        return pStart + pContent + pEnd;
+    }
+    string FormatCSS(string line)
+    {
+        vector<Styles> styles = DefaultStyles();
+        string formattedLine;
+            if (line.substr(0,1) == "/")
+            {
+                string styleName = line.substr(1,line.find(" ",1)-1);
+                auto it = find_if(styles.begin(), styles.end(), [&styleName](const Styles& obj) {return obj.name == styleName;});
+                if (it != styles.end())
+                {
+                    Styles s = styles[distance(styles.begin(), it)];
+                    formattedLine = CreateCSS(s);
+                }
+                else ErrMsg("Line: '", line, "' command: '", styleName, "' not recognised.");
+            }
+            else
+            {
+                
+            }
+            return formattedLine;
+    }
+    string FormatHTML(string line)
+    {
+        string formattedLine;
+            if (line.substr(0,1) == "/")
+            {
+                return "";
+            }
+            else return "" ;
+    }
     void Publish()
     {
         string publishedFullPath = path +"/"+ name.substr(0,name.rfind(".")) + ".html";
@@ -114,13 +176,17 @@ class LFile
 
                 ofstream pubFile; 
                 pubFile.open (publishedFullPath, ios_base::app);
-                pubFile << HTMLStartEnd();
-                pubFile << "<a>test</a>";
-                for (string line : content)
+                pubFile << HTMLSection(0);
+                for (string line : content) //CSS
                 {
-                    pubFile << line;
+                    pubFile << FormatCSS(line);
                 }
-                pubFile << HTMLStartEnd(false);
+                pubFile << HTMLSection(1);
+                for (string line : content)//Text
+                {
+                    pubFile << FormatHTML(line);
+                }
+                pubFile << HTMLSection(2);
                 pubFile.close();
 
                 SysMsg("html file published successfully - Location: '", publishedFullPath, "'.");        

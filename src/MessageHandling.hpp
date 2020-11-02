@@ -13,9 +13,9 @@ void Exit()
     exitCalled = true;
 }
 
-void ErrMsg(string message) 
+void ErrMsg(string m, string m2 = "",string m3 = "",string m4 = "",string m5 = "",string m6 = "",string m7 = "") 
 {
-    cout << "\n  --!ERR >> '" << message << "'" << endl << endl;
+    cout << "\n  --!ERR >> '" << m << m2 << m3 << m4 << m5 << m6 << m7 << "'" << endl << endl;
 }
 void SysMsg(string m, string m2 = "",string m3 = "",string m4 = "",string m5 = "",string m6 = "",string m7 = "") //cleanup
 {
