@@ -169,13 +169,14 @@ class LFile
             
         if (line.substr(0,1) != "/") styleName = "text";
         else styleName = line.substr(1,line.find(" ",1)-1);
-        
+
         Styles s = GetStyleByName(styleName);
 
         string pStart = "\n<" + s.element + " class=\"" + s.name + "\"" + ">";
         string pContent;
-        if (line.find(" ") != string::npos) pContent = line.substr(line.find(" ",1), line.length());
-        else if (line.substr(0,1) != "/") pContent = line;
+        if (line.substr(0,1) != "/") pContent = line;
+        else if (line.find(" ") != string::npos) pContent = line.substr(line.find(" ",1), line.length());
+        
         string pEnd = "</" + s.element + ">\n";
 
         return pStart + pContent + pEnd + ((s.element == "a" ) ? "<br>" : "");
