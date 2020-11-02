@@ -1,0 +1,14 @@
+/title Shopping List
+
+/subtitle Vegetables
+
+red peppers
+/red tomatoes
+babycorn
+/highlight pak choi
+
+/subtitle Fruit
+
+apples
+
+/highlight bananas
