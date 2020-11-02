@@ -62,10 +62,10 @@ class LFile
         if(section == 0)
         {
             string p1 = "<!DOCTYPE html>\n<html>\n<head>\n<title>";
-            string p2 = "</title>\n<style>";
+            string p2 = "</title>\n<style>\n";
             return p1 + name.substr(0,name.rfind(".")) + p2;
         }
-        else if (section == 1) return "</style></head>\n<body>\n";
+        else if (section == 1) return "</style>\n</head>\n<body>\n";
         return "\n</body>\n</html>";
     }
 
