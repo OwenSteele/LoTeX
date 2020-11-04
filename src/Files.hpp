@@ -176,6 +176,6 @@ class LFile
                 pubFile << HTMLSection(2);
                 pubFile.close();
 
-                SysMsg("html file published successfully - Location: '" + publishedFullPath + "'.");        
+                SysMsg("html file published successfully - Location: '" + publishedFullPath + "'. FINISHED");        
     }
 };
