@@ -2,9 +2,9 @@
 
 int main() {
 
-    cout << endl << "---START---" << endl;
-    cout << "   To Exit 'Ctrl + C' or type '###' on prompt." << endl;
-    cout << "   For help 'type #h" << endl << endl;
+    std::cout << std::endl << "---START---" << std::endl;
+    std::cout << "   To Exit 'Ctrl + C' or type '###' on prompt." << std::endl;
+    std::cout << "   For help 'type #h" << std::endl << std::endl;
 
     CodeMain();
     

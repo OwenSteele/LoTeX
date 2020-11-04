@@ -25,8 +25,6 @@
 #include "Files.hpp"
 #include "Code.hpp"
 
-using namespace std;
-
 class LFile;
 
 #endif

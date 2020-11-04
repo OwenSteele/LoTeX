@@ -1,8 +1,7 @@
 #include "SrcFiles.h"
 
-using namespace std;
 
-const vector<string> knownCommands = {"'###' = Exit program.", "'#h' = Show Help", "'#b' = break out of current area."};
+const std::vector<std::string> knownCommands = {"'###' = Exit program.", "'#h' = Show Help", "'#b' = break out of current area."};
 
 bool exitCalled = false;
 void CodeMain();
@@ -13,22 +12,22 @@ void Exit()
     exitCalled = true;
 }
 
-void ErrMsg(string m, string m2 = "",string m3 = "",string m4 = "",string m5 = "",string m6 = "",string m7 = "") 
+void ErrMsg(std::string&& message) 
 {
-    cout << "\n  --!ERR >> '" << m << m2 << m3 << m4 << m5 << m6 << m7 << "'" << endl << endl;
+    std::cout << "\n  --!ERR >> '" << message << "'" << std::endl << std::endl;
 }
-void SysMsg(string m, string m2 = "",string m3 = "",string m4 = "",string m5 = "",string m6 = "",string m7 = "") //cleanup
+void SysMsg(std::string&& message) //cleanup
 {
-    cout << "\n  --!SYS >> '" << m << m2 << m3 << m4 << m5 << m6 << m7 <<"'" << endl << endl;
+    std::cout << "\n  --!SYS >> '" << message << "'" << std::endl << std::endl;
 }
-string MsgIn()
+std::string MsgIn()
     {
         bool validInput = false;
-        string input;
+        std::string input;
 
         do{
-            cout << " << ";
-            cin >> input; //aim to have only cin in program here
+            std::cout << " << ";
+            std::cin >> input; //aim to have only std::cin in program here
 
             //check for known cmds
             if (input == "###") 
@@ -39,11 +38,11 @@ string MsgIn()
             else if (input == "#h")
             {
                 SysMsg("___HELP - COMMANDS___");
-                for(const string& cmd : knownCommands)
+                for(const std::string& cmd : knownCommands)
                 {
-                    cout << "    - " << cmd << endl;
+                    std::cout << "    - " << cmd << std::endl;
                 }
-                cout << "_____________________" << endl;
+                std::cout << "_____________________" << std::endl;
             }
             else if (input == "#b")
             {
@@ -52,7 +51,7 @@ string MsgIn()
             } 
             else if(input != "") validInput=true;
 
-            else cout << "ERR, retry << ";
+            else std::cout << "ERR, retry << ";
         }while (!validInput);
 
         return input;
