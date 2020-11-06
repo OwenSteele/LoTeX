@@ -1,5 +1,7 @@
 #include "SrcFiles.h"
 
+#define GetPropertyName(PropertyName) #PropertyName
+
 class Styles
 {
     public:
@@ -17,11 +19,28 @@ class Styles
         color = rcolor;
         background_color = rbackground_color;
         font_family = rfont_family;
-        font_size = rfont_size;
+        font_size = rfont_size;;
+
+    }
+    private:
+    std::string ReplaceUnderscore(std::string text)
+    {
+        if (text.find("_")!= std::string::npos) text.replace(text.find("_"),1,"-");
+        return text;
+    }
+    public:
+    std::string ReturnCSS()
+    {
+        std::string tag = "." + name + " {\n";
+        std::string css = tag + 
+        GetPropertyName(color) + ": " + color + ";\n" +
+        ReplaceUnderscore(GetPropertyName(background_color)) + ": " + background_color + ";\n" +
+        ReplaceUnderscore(GetPropertyName(font_family)) + ": " + font_family + ";\n" +
+        ReplaceUnderscore(GetPropertyName(font_size)) + ": " + std::to_string(font_size) + "px;\n}\n";
+        
+        return css;
     }
 };
-
-
 
 inline std::vector<Styles> fileStyles;
 
