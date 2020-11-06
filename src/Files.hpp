@@ -69,6 +69,49 @@ class LFile
         else if (section == 1) return "</style>\n</head>\n<body>\n";
         return "\n</body>\n</html>";
     }
+    void GetCustomStyles(std::vector<std::string> lines)
+    {
+        int stylesLineStart=-1;
+        int stylesLineEnd=-1;
+        std::vector<std::string> styleLines;
+        for (int n = 0; n < lines.size(); n++)
+        {
+            if(lines[n].substr(0,7) == "#styles") stylesLineStart = n;
+            else if (lines[n].substr(0,10) == "#endstyles") stylesLineEnd = n;
+            
+            if (stylesLineStart != -1 && n > stylesLineStart && stylesLineEnd == -1) styleLines.emplace_back(lines[n]);
+            if (stylesLineEnd > 0) break;
+        }
+        if (stylesLineStart == -1 && stylesLineEnd == -1)
+        { 
+            ErrMsg("Styles region not found - using default styles");
+            CreateDefaultStyles();
+        }
+        else
+        {            
+            for(std::string line : styleLines)
+            {
+                std::vector<std::string> newStyle;
+                if(line.substr(0,1) == "/")
+                {
+                    newStyle.emplace_back(line.substr(1,line.find(" ")-1));
+                    line = line.substr(line.find(" ")+1, line.length());
+
+                    do{
+                        int&& comma = line.find(",");
+                        newStyle.emplace_back(line.substr(0,comma));
+                        line = line.substr(comma+1, line.length());
+                    }while (line.find(",") != std::string::npos);
+                    newStyle.emplace_back(line);
+                }
+                else ErrMsg("Invalid style syntax in document: '" + line + "'. Each line and style addition must start with a '/'");
+                AddStyle(newStyle);
+            }
+            SysMsg("User-defined styles found and compiled.");
+            //remove styles from content
+            for (int n = stylesLineStart; n <= stylesLineEnd; n++) content.erase(content.begin());
+        }
+    }
     
     public:
     explicit LFile(std::string& fullPath, bool newFile = false)
@@ -111,7 +154,7 @@ class LFile
     std::vector<std::string> existingStyles;
     std::string FormatCSS(std::string& line)
     {
-        std::shared_ptr<std::vector<Styles>> styles = std::make_shared<std::vector<Styles>>(GetDefaultStyles());
+        std::shared_ptr<std::vector<Styles>> styles = std::make_shared<std::vector<Styles>>(GetFileStyles());
         std::string formattedLine;
         std::string styleName;
             
@@ -127,7 +170,8 @@ class LFile
                  [&currentStyleName] (const std::string& eS) {return eS == currentStyleName;});
             if (it == existingStyles.end())
             {
-                existingStyles.emplace_back(currentStyleName);                        formattedLine = CreateCSS(s);
+                existingStyles.emplace_back(currentStyleName);                        
+                formattedLine = CreateCSS(s);
             }
         }
         else ErrMsg("Line: '" + line + "' command: '" + styleName + "' not recognised."); //create add new style option here
@@ -153,29 +197,92 @@ class LFile
 
         return pStart + pContent + pEnd;
     }
-    void Publish()
+    std::string HTMLCleanup(std::vector<std::string> text)
     {
-        CreateDefaultStyles();
+        std::string html;
+        std::string currentTag = "";
+        std::string lastTag;
+        for (int n = 0; text.size(); n++) 
+        {
+            if (text[n].find(">") == std::string::npos) break;
+            
+            lastTag = currentTag;
+            currentTag = text[n].substr(0,text[n].find(">"));
 
+            if (currentTag == lastTag && currentTag != "</br>")
+            {
+                text[n-1] = text[n-1].substr(0, text[n-1].find("<",3)) + " </br>\n";
+                text[n] = text[n].substr(text[n].find(">",1)+1,text[n].length());
+            }
+        }
+        for(std::string line : text) html += line;
+        return html;
+    }
+    void Publish(int styleInclusionType)
+    {
         std::string&& publishedFullPath = path +"/"+ name.substr(0,name.rfind(".")) + ".html";
                  
-                if(!CheckPathExists(publishedFullPath)) CreateFile(std::forward<std::string&&>(publishedFullPath));
+        if(!CheckPathExists(publishedFullPath))
+        {
+             CreateFile(std::forward<std::string&&>(publishedFullPath));
+             SysMsg("Creating " + name.substr(0,name.rfind(".")) + "'.html' file");
+        }
+        else
+        {
+            SysMsg("Existing file found - overwriting.");
+            std::ofstream pubFile; 
+            pubFile.open (publishedFullPath,  std::ofstream::out | std::ofstream::trunc);
+            pubFile.close();
+        }
+        
 
-                std::ofstream pubFile; 
-                pubFile.open (publishedFullPath, std::ios_base::app);
-                pubFile << HTMLSection(0);
-                for (std::string line : content) //CSS
-                {
-                    pubFile << FormatCSS(line);
-                }
-                pubFile << HTMLSection(1);
-                for (std::string line : content)//Text
-                {
-                    pubFile << FormatHTML(line);
-                }
-                pubFile << HTMLSection(2);
-                pubFile.close();
+        if (styleInclusionType == 1)
+        {
+            SysMsg("Locating in-file '#style' region");
+            GetCustomStyles(content);
+        }
+        else if (styleInclusionType == 2)
+        {
+            std::string input;
+            std::string styleFullPath;
+            do{
+                std::cout << "Enter file name and path containing your styles";
+                input = MsgIn();
+                styleFullPath = CorrectPathName(input);
 
-                SysMsg("html file published successfully - Location: '" + publishedFullPath + "'. FINISHED");        
+                if(CheckPathExists(styleFullPath))
+                {
+                    SysMsg("Styles file found.");
+                    break;
+                }
+                else ErrMsg("File not found, try again");
+            }while (true);
+
+            std::vector<std::string> styleContent = GetFileContent(styleFullPath);
+            SysMsg("File contents retrieved.");
+            GetCustomStyles(std::move(styleContent));
+        } //other file
+        else CreateDefaultStyles();
+
+        SysMsg("Writing to '.html' file.");
+        std::ofstream pubFile; 
+        pubFile.open (publishedFullPath, std::ios_base::app);
+
+        pubFile << HTMLSection(0);
+
+        for (std::string line : content) pubFile << FormatCSS(line);
+
+        pubFile << HTMLSection(1);
+
+        std::vector<std::string> htmlText;
+
+        for (std::string line : content) htmlText.emplace_back(FormatHTML(line));
+        pubFile << HTMLCleanup(std::move(htmlText));
+
+        pubFile << HTMLSection(2);
+
+        pubFile.close();
+
+        SysMsg("html file published successfully - Location: '" + publishedFullPath + "'. FINISHED");        
     }
 };

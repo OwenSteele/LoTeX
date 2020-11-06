@@ -11,14 +11,25 @@ void Exit()
     //add message?
     exitCalled = true;
 }
+std::string GetTime()
+{
+    time_t rawTime;
+    struct tm * timeinfo;
+    char buffer[80];
+    time(&rawTime);
+    timeinfo = localtime(&rawTime);
+    strftime(buffer,sizeof(buffer), "%H:%M:%S", timeinfo);
+    std::string str(buffer);
+    return str;
+}
 
 void ErrMsg(std::string&& message) 
 {
-    std::cout << "\n  --!ERR >> '" << message << "'" << std::endl << std::endl;
+    std::cout << "      --!ERR >> '" << message << "' " << GetTime() << std::endl;
 }
 void SysMsg(std::string&& message) //cleanup
 {
-    std::cout << "\n  --!SYS >> '" << message << "'" << std::endl << std::endl;
+    std::cout << "      --!SYS >> '" << message << "' " << GetTime()<< std::endl;
 }
 std::string MsgIn()
     {
@@ -56,3 +67,19 @@ std::string MsgIn()
 
         return input;
     }
+int MsgInInt(std::optional<int>&& options = NULL)
+{
+    do{
+        try{
+            int input = std::stoi(MsgIn());
+            if (options != NULL)
+            {
+                if (input < options && input > -1) return input;
+                else ErrMsg("Input is outside options range");
+            }
+            else return input;
+        }
+        catch(const std::exception& e) {ErrMsg("You must enter an integer");}
+    } while (true);
+    
+}
