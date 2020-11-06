@@ -172,7 +172,7 @@ class LFile
         std::string html;
         std::string currentTag = "";
         std::string lastTag;
-        for (int n = 0; text.size(); n++) 
+        for (int n = 0; n < text.size(); n++) 
         {
             if (text[n].find(">") == std::string::npos) break;
 
@@ -247,7 +247,9 @@ class LFile
         std::vector<std::string> htmlText;
 
         for (std::string line : content) htmlText.emplace_back(FormatHTML(line));
-        pubFile << HTMLCleanup(std::move(htmlText));
+
+        std::string html = HTMLCleanup(std::move(htmlText));
+        pubFile << html;
 
         pubFile << HTMLSection(2);
 
