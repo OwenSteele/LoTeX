@@ -248,8 +248,7 @@ class LFile
 
         for (std::string line : content) htmlText.emplace_back(FormatHTML(line));
 
-        std::string html = HTMLCleanup(std::move(htmlText));
-        pubFile << html;
+        pubFile << HTMLCleanup(std::move(htmlText));
 
         pubFile << HTMLSection(2);
 
