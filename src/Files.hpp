@@ -63,7 +63,8 @@ class LFile
         {
             std::string p1 = "<!DOCTYPE html>\n<html>\n<head>\n<title>";
             std::string p2 = "</title>\n<style>\n";
-            return p1 + name.substr(0,name.rfind(".")) + p2;
+            Styles sBody = GetStyleByName("body");
+            return p1 + name.substr(0,name.rfind(".")) + p2 + sBody.ReturnCSS();
         }
         else if (section == 1) return "</style>\n</head>\n<body>\n";
         return "\n</body>\n</html>";
@@ -93,7 +94,13 @@ class LFile
                 std::vector<std::string> newStyle;
                 if(line.substr(0,1) == "/")
                 {
-                    newStyle.emplace_back(line.substr(1,line.find(" ")-1));
+                    std::string styleName = line.substr(1,line.find(" ")-1);
+                    if (styleName == "default")
+                    {
+                        newStyle.emplace_back("body");
+                        newStyle.emplace_back("");
+                    }
+                    else newStyle.emplace_back(styleName);
                     line = line.substr(line.find(" ")+1, line.length());
 
                     do{
@@ -128,9 +135,10 @@ class LFile
         std::string formattedLine;
         std::string styleName;
             
-        if (line.substr(0,1) != "/") styleName = "text";
+        if (line.substr(0,1) != "/") styleName = "empty";
         else styleName = line.substr(1,line.find(" ",1)-1);
-                
+        
+        if (styleName == "default") styleName = "empty";        
         Styles s = GetStyleByName(styleName);
         if (!s.name.empty())
         {
@@ -143,8 +151,7 @@ class LFile
                 existingStyles.emplace_back(currentStyleName);                        
                 formattedLine = s.ReturnCSS();
             }
-        }
-        else ErrMsg("Line: '" + line + "' command: '" + styleName + "' not recognised."); //create add new style option here
+        } //create add new style option here?
         return formattedLine;
     }
     std::string FormatHTML(std::string& line)
@@ -152,19 +159,34 @@ class LFile
         if (line.empty()) return "</br>";
 
         std::string styleName;
+        std::string pStart;
+        std::string pContent;
+        std::string pEnd;
             
-        if (line.substr(0,1) != "/") styleName = "text";
-        else styleName = line.substr(1,line.find(" ",1)-1);
-
+        if (line.substr(0,1) == "/") styleName = line.substr(1,line.find(" ",1)-1);
+        else styleName = "empty";
         Styles s = GetStyleByName(styleName);
 
-        std::string pStart = "\n<" + s.element + " class=\"" + s.name + "\"" + ">";
-        std::string pContent;
-        if (line.substr(0,1) != "/") pContent = line;
-        else if (line.find(" ") != std::string::npos) pContent = line.substr(line.find(" ",1)+1, line.length());
+        if (!s.name.empty())
+        {
+            pStart = "\n<" + s.element + " class=\"" + s.name + "\"" + ">";
+            pContent = line.substr(line.find(" ",1)+1, line.length());
+            pEnd = "</" + s.element + ">";
+        }
+        else if (s.name.empty() && line.substr(0,1) == "/")
+        { 
+            pStart = "\n<p>";
+            pContent = line.substr(line.find(" ",1)+1, line.length());
+            pEnd = "</p>";
+        }
+        else
+        {
+            pStart = "\n<p>";
+            pContent = line;
+            pEnd = "</p>";
+        }
         
-        std::string pEnd = "</" + s.element + ">";
-
+        
         return pStart + pContent + pEnd;
     }
     std::string HTMLCleanup(std::vector<std::string> text)

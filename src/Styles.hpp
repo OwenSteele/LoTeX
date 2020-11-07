@@ -1,44 +1,54 @@
 #include "SrcFiles.h"
 
-#define GetPropertyName(PropertyName) #PropertyName
+#define GetName(PropertyName) #PropertyName
 
 class Styles
 {
+    private: 
+    std::string formattedAttributes;
+    void FormatAttribute(std::string&& id, std::string value)
+    {
+        if(!value.empty())
+        {
+            if (id.find("_")!= std::string::npos) id.replace(id.find("_"),1,"-");
+            formattedAttributes += id + ": " + value + ";\n";
+        }
+    }
+
     public:
     std::string name;
     std::string element;
     std::string color;
     std::string background_color;
     std::string font_family;
-    int font_size;
+    std::string font_size;
+    std::string text_align;
 
-    explicit Styles (std::string rname, std::string relement, std::string rcolor, std::string rbackground_color, std::string rfont_family, int rfont_size)
+    explicit Styles (
+        std::string rname, std::string relement="a",
+        std::string rcolor="", std::string rbackground_color="",
+        std::string rfont_family="", std::string rfont_size="",
+        std::string rtext_align="")
     {
         name = rname;
         element = relement;
-        color = rcolor;
-        background_color = rbackground_color;
-        font_family = rfont_family;
-        font_size = rfont_size;;
 
+        color = rcolor;
+        FormatAttribute(GetName(color), color);
+        background_color = rbackground_color;
+        FormatAttribute(GetName(background_color), background_color);
+        font_family = rfont_family;
+        FormatAttribute(GetName(font_family), font_family);
+        font_size = rfont_size + ((rfont_size.rfind("px") == std::string::npos)? "px": "");
+        FormatAttribute(GetName(font_size), font_size);
+        text_align = rtext_align;
+        FormatAttribute(GetName(text_align), text_align);
     }
-    private:
-    std::string ReplaceUnderscore(std::string text)
-    {
-        if (text.find("_")!= std::string::npos) text.replace(text.find("_"),1,"-");
-        return text;
-    }
-    public:
     std::string ReturnCSS()
     {
-        std::string tag = "." + name + " {\n";
-        std::string css = tag + 
-        GetPropertyName(color) + ": " + color + ";\n" +
-        ReplaceUnderscore(GetPropertyName(background_color)) + ": " + background_color + ";\n" +
-        ReplaceUnderscore(GetPropertyName(font_family)) + ": " + font_family + ";\n" +
-        ReplaceUnderscore(GetPropertyName(font_size)) + ": " + std::to_string(font_size) + "px;\n}\n";
-        
-        return css;
+        std::string sName = (name == "body") ? name : "." + name;
+        if (formattedAttributes.empty()) return "";
+        return sName + " {\n" + formattedAttributes + "}\n";
     }
 };
 
@@ -48,9 +58,10 @@ std::vector<Styles> GetFileStyles() {return fileStyles;}
 
 void AddStyle(std::vector<std::string> attributes)
 {
+    while(attributes.size() < 7) attributes.emplace_back("");
     try
     {
-        Styles s (attributes[0],attributes[1],attributes[2],attributes[3],attributes[4],std::stoi(attributes[5]));
+        Styles s (attributes[0],attributes[1],attributes[2],attributes[3],attributes[4],attributes[5],attributes[6]);
         fileStyles.emplace_back(s);
     }
     catch(const std::exception& e)
@@ -59,16 +70,15 @@ void AddStyle(std::vector<std::string> attributes)
         ErrMsg(e.what());
     }
 }
-
-inline Styles normalText ("text","p","black","white","Arial",12);
+inline Styles normalText ("text","p","black","white","Arial","12");
 void CreateDefaultStyles()
 {
     if (fileStyles.size() == 0)
     { 
-    Styles title ("title","h1","black","white","Arial",32);
-    Styles subtitle ("subtitle","h2","black","white","Arial",20);
-    Styles redText ("red","p","red","white","Arial",12);
-    Styles highlightedText ("highlight","p","white","red","Arial",12);
+    Styles title ("title","h1","black","white","Arial","32");
+    Styles subtitle ("subtitle","h2","black","white","Arial","20");
+    Styles redText ("red","p","red","white","Arial","12");
+    Styles highlightedText ("highlight","p","white","red","Arial","12");
     fileStyles.emplace_back(normalText);
     fileStyles.emplace_back(title);
     fileStyles.emplace_back(subtitle);
@@ -82,12 +92,13 @@ bool StyleExists(std::string& styleName)
     if (it != fileStyles.end()) return true;
     else return false;                                 
 }
-Styles GetStyleByName(std::string& styleName)
+inline Styles empty ("","","","","","");
+Styles GetStyleByName(std::string styleName)
 {
     if (StyleExists(styleName))
     {
         auto it = find_if(fileStyles.begin(), fileStyles.end(), [&styleName] (const Styles& obj) {return obj.name == styleName;});
         return fileStyles[distance(fileStyles.begin(), it)];
     }
-    else return normalText;
+    else return empty;
 }
