@@ -6,12 +6,18 @@ class Styles
 {
     private: 
     std::string formattedAttributes;
+    std::string Trim(std::string str)
+    {
+        while (str.substr(0,1) == " ") str = str.substr(1,str.length());
+        while (str.substr(str.length()-1,str.length()) == " ") str = str.substr(0,str.length()-1);
+        return str;
+    }
     void FormatAttribute(std::string&& id, std::string value)
     {
         if(!value.empty())
         {
             if (id.find("_")!= std::string::npos) id.replace(id.find("_"),1,"-");
-            formattedAttributes += id + ": " + value + ";\n";
+            formattedAttributes += id + ": " + Trim(std::move(value)) + ";\n";
         }
     }
 
