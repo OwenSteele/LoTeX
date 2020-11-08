@@ -45,6 +45,12 @@ class LFile
         }
         return false;
     }
+    static std::string RemoveComments(std::string line)
+    {
+        if (line.find("*||") != std::string::npos) line.replace(line.find("*||"),1,""); //keeps || in line
+        else if (line.find("||") != std::string::npos) line = line.substr(0, line.find("||"));
+        return line;    
+    }
     static std::vector<std::string> GetFileContent (std::string& fullPath)
     {
         std::vector<std::string> content;
@@ -52,7 +58,7 @@ class LFile
         std::ifstream exFile;
 
 	    exFile.open (fullPath, std::ios_base::app);
-        while (getline(exFile, currentLine)) content.emplace_back(currentLine);
+        while (getline(exFile, currentLine)) content.emplace_back(RemoveComments(std::move(currentLine)));
 	    exFile.close();
 
         return content;
@@ -64,7 +70,7 @@ class LFile
             std::string p1 = "<!DOCTYPE html>\n<html>\n<head>\n<title>";
             std::string p2 = "</title>\n<style>\n";
             Styles sBody = GetStyleByName("body");
-            return p1 + name.substr(0,name.rfind(".")) + p2 + (sBody.name !="" ? sBody.ReturnCSS(): "");
+            return p1 + name.substr(0,name.rfind(".")) + p2 + (sBody.name !="" ? sBody.ReturnCSS() : "");
         }
         else if (section == 1) return "</style>\n</head>\n<body>\n";
         return "\n</body>\n</html>";
@@ -110,7 +116,8 @@ class LFile
                     }while (line.find(",") != std::string::npos);
                     newStyle.emplace_back(line);
                 }
-                else ErrMsg("Invalid style syntax in document: '" + line + "'. Each line and style addition must start with a '/'");
+                else if (!line.empty()) ErrMsg("Invalid style syntax in document: '" + line + "'. Each line and style addition must start with a '/'");
+
                 AddStyle(newStyle);
             }
             SysMsg("User-defined styles found and compiled.");
