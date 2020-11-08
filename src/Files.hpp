@@ -64,7 +64,7 @@ class LFile
             std::string p1 = "<!DOCTYPE html>\n<html>\n<head>\n<title>";
             std::string p2 = "</title>\n<style>\n";
             Styles sBody = GetStyleByName("body");
-            return p1 + name.substr(0,name.rfind(".")) + p2 + sBody.ReturnCSS();
+            return p1 + name.substr(0,name.rfind(".")) + p2 + (sBody.name !="" ? sBody.ReturnCSS(): "");
         }
         else if (section == 1) return "</style>\n</head>\n<body>\n";
         return "\n</body>\n</html>";
