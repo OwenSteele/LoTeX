@@ -1,42 +1,16 @@
 #include "SrcFiles.h"
 
-//prototypes
-void CodeMain();
-
-int MenuSelection()
-{
-	std::string input;
-	std::stringstream inputSS;
-	int inputI =0;
-
-	input = MsgIn();
-	inputSS << input.substr(0, 1);
-	inputSS >> inputI;
-
-	return inputI;
-}
-
 void Menu(std::unordered_map<int, std::pair<std::function<void()>, std::string>> dict, const std::string&& functionName = "")
 {
-
 	std::cout << "\n__" << functionName << "() Menu__\n";
-	for (auto it = dict.cbegin(); it != dict.cend(); ++it)
-	{
-		std::cout <<"   " << it->first << " - " << it->second.second << std::endl;
-	}
+	for (auto it : dict) std::cout <<"   " << it.first << " - " << it.second.second << std::endl;
 	std::cout << "Press a key and press enter";
-	do
-	{
-		auto option = dict.find(MenuSelection());
 
-		if (option != dict.end())
-		{
-			return option->second.first();
-		}
-		else std::cout << "INPUT_ERR: Invalid input, please try again";
-
+	do{		
+		auto option = dict.find(MsgInInt());
+		if (option != dict.end()) return option->second.first();
+		else ErrMsg("Invalid input, please try again");
 	} while (true);
-
 }
 int SelectStylesType()
 {
@@ -82,10 +56,8 @@ void CodeMain()
 {
 	while(!exitCalled){
     	std::unordered_map<int, std::pair<std::function<void()>, std::string>> newMenu;
-
 		newMenu.insert(std::make_pair(0, std::make_pair(&Exit, "Exit")));
 		newMenu.insert(std::make_pair(1, std::make_pair(&FilePublish, "Publish")));
-
 		Menu(newMenu, __FUNCTION__);
 	}
 	exit(0);

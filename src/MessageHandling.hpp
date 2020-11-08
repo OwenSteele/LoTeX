@@ -1,16 +1,12 @@
 #include "SrcFiles.h"
 
-
 const std::vector<std::string> knownCommands = {"'###' = Exit program.", "'#h' = Show Help", "'#b' = break out of current area."};
 
 bool exitCalled = false;
 void CodeMain();
 
-void Exit()
-{
-    //add message?
-    exitCalled = true;
-}
+void Exit() { exitCalled = true; }
+
 std::string GetTime()
 {
     time_t rawTime;
@@ -23,14 +19,11 @@ std::string GetTime()
     return str;
 }
 
-void ErrMsg(std::string&& message) 
-{
-    std::cout << "      --!ERR >> '" << message << "' " << GetTime() << std::endl;
-}
-void SysMsg(std::string&& message) //cleanup
-{
-    std::cout << "      --!SYS >> '" << message << "' " << GetTime()<< std::endl;
-}
+void ErrMsg(std::string&& message) { 
+    std::cout << "      --!ERR >> '" << message << "' " << GetTime() << std::endl; }
+void SysMsg(std::string&& message) {
+    std::cout << "      --!SYS >> '" << message << "' " << GetTime()<< std::endl; }
+
 std::string MsgIn()
     {
         bool validInput = false;
@@ -81,5 +74,4 @@ int MsgInInt(std::optional<int>&& options = NULL)
         }
         catch(const std::exception& e) {ErrMsg("You must enter an integer");}
     } while (true);
-    
 }

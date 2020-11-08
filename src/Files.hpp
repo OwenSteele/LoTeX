@@ -1,8 +1,5 @@
 #include "SrcFiles.h"
 
-//prototypes
-int LineCount();
-
 bool CheckPathExists(const std::filesystem::path& dirPath, std::filesystem::file_status status = std::filesystem::file_status{})
     {
         if(std::filesystem::status_known(status) ? std::filesystem::exists(status) : std::filesystem::exists(dirPath)) return true;
@@ -27,30 +24,6 @@ class LFile
     std::string path;
 
     private:
-    bool CheckRange(int lower, int upper = -1)
-    {
-        if (upper == -1)
-        {
-            if (lower > 0 && lower < LineCount()) return true;
-            else ErrMsg("Value is outside of file line range.");
-        }
-        else
-        {
-            if(lower >= 0 && lower < LineCount() && upper > 0 && upper <= LineCount())
-            {
-                if (lower < upper) return true;
-                else ErrMsg("First value must be lower than the second."); 
-            }
-            else ErrMsg(("A value is outside of file line range."));
-        }
-        return false;
-    }
-    static std::string RemoveComments(std::string line)
-    {
-        if (line.find("*||") != std::string::npos) line.replace(line.find("*||"),1,""); //keeps || in line
-        else if (line.find("||") != std::string::npos) line = line.substr(0, line.find("||"));
-        return line;    
-    }
     static std::vector<std::string> GetFileContent (std::string& fullPath)
     {
         std::vector<std::string> content;
@@ -58,19 +31,27 @@ class LFile
         std::ifstream exFile;
 
 	    exFile.open (fullPath, std::ios_base::app);
-        while (getline(exFile, currentLine)) content.emplace_back(RemoveComments(std::move(currentLine)));
+        while (getline(exFile, currentLine))
+        {
+            if (currentLine.find("*||") != std::string::npos)
+                 currentLine.replace(currentLine.find("*||"),3,"'Note: ") += "'"; //adds note around comment
+            else if (currentLine.find("||") != std::string::npos) 
+                currentLine = currentLine.substr(0, currentLine.find("||"));
+          
+            content.emplace_back(currentLine);
+        }
 	    exFile.close();
 
         return content;
     }
-    std::string HTMLSection(int section)
+    const std::string HTMLSection(int section)
     {
         if(section == 0)
         {
             std::string p1 = "<!DOCTYPE html>\n<html>\n<head>\n<title>";
             std::string p2 = "</title>\n<style>\n";
             Styles sBody = GetStyleByName("body");
-            return p1 + name.substr(0,name.rfind(".")) + p2 + (sBody.name !="" ? sBody.ReturnCSS() : "");
+            return p1 + name.substr(0,name.rfind(".")) + p2 + (!sBody.name.empty() ? sBody.ReturnCSS() : "");
         }
         else if (section == 1) return "</style>\n</head>\n<body>\n";
         return "\n</body>\n</html>";
@@ -125,16 +106,27 @@ class LFile
             for (int n = stylesLineStart; n <= stylesLineEnd; n++) content.erase(content.begin());
         }
     }
-    
-    public:
-    explicit LFile(std::string& fullPath, bool newFile = false)
+    static std::string HTMLCleanup(std::vector<std::string> text)
     {
-        int&& lastSlashPos = fullPath.rfind("/");
-        path = CorrectPathName(fullPath).substr(0,lastSlashPos);
-        name = fullPath.substr(lastSlashPos+1,fullPath.length()-lastSlashPos); //name = after last '/' in path
-        if(!newFile) content = GetFileContent(fullPath);
+        std::string html;
+        std::string currentTag = "";
+        std::string lastTag;
+        for (int n = 0; n < text.size(); n++) 
+        {
+            if (text[n].find(">") == std::string::npos) break;
+
+            lastTag = currentTag;
+            currentTag = text[n].substr(0,text[n].find(">"));
+
+            if (currentTag == lastTag && currentTag != "</br>")
+            {
+                text[n-1] = text[n-1].substr(0, text[n-1].find("<",3)) + " </br>\n";
+                text[n] = text[n].substr(text[n].find(">",1)+1,text[n].length());
+            }
+        }
+        for(std::string& line : text) html += line;
+        return html;
     }
-    std::vector<Styles> addedStyles;
     std::vector<std::string> existingStyles;
     std::string FormatCSS(std::string& line)
     {
@@ -161,7 +153,7 @@ class LFile
         } //create add new style option here?
         return formattedLine;
     }
-    std::string FormatHTML(std::string& line)
+    static std::string FormatHTML(std::string& line)
     {
         if (line.empty()) return "</br>";
 
@@ -192,34 +184,21 @@ class LFile
             pContent = line;
             pEnd = "</p>";
         }
-        
-        
         return pStart + pContent + pEnd;
     }
-    std::string HTMLCleanup(std::vector<std::string> text)
+    public:
+    explicit LFile(std::string& fullPath, bool newFile = false)
     {
-        std::string html;
-        std::string currentTag = "";
-        std::string lastTag;
-        for (int n = 0; n < text.size(); n++) 
-        {
-            if (text[n].find(">") == std::string::npos) break;
-
-            lastTag = currentTag;
-            currentTag = text[n].substr(0,text[n].find(">"));
-
-            if (currentTag == lastTag && currentTag != "</br>")
-            {
-                text[n-1] = text[n-1].substr(0, text[n-1].find("<",3)) + " </br>\n";
-                text[n] = text[n].substr(text[n].find(">",1)+1,text[n].length());
-            }
-        }
-        for(std::string line : text) html += line;
-        return html;
+        int&& lastSlashPos = fullPath.rfind("/");
+        path = CorrectPathName(fullPath).substr(0,lastSlashPos);
+        name = fullPath.substr(lastSlashPos+1,fullPath.length()-lastSlashPos); //name = after last '/' in path
+        if(!newFile) content = GetFileContent(fullPath);
     }
-    void Publish(int styleInclusionType)
+    void Publish(int styleInclusionType = 0)
     {
         std::string&& publishedFullPath = path +"/"+ name.substr(0,name.rfind(".")) + ".html";
+        std::vector<std::string> htmlText;
+        std::ofstream pubFile; 
                  
         if(!CheckPathExists(publishedFullPath))
         {
@@ -233,8 +212,6 @@ class LFile
             pubFile.open (publishedFullPath,  std::ofstream::out | std::ofstream::trunc);
             pubFile.close();
         }
-        
-
         if (styleInclusionType == 1)
         {
             SysMsg("Locating in-file '#style' region");
@@ -244,6 +221,7 @@ class LFile
         {
             std::string input;
             std::string styleFullPath;
+
             do{
                 std::cout << "Enter file name and path containing your styles";
                 input = MsgIn();
@@ -264,25 +242,14 @@ class LFile
         else CreateDefaultStyles();
 
         SysMsg("Writing to '.html' file.");
-        std::ofstream pubFile; 
         pubFile.open (publishedFullPath, std::ios_base::app);
-
         pubFile << HTMLSection(0);
-
         for (std::string line : content) pubFile << FormatCSS(line);
-
         pubFile << HTMLSection(1);
-
-        std::vector<std::string> htmlText;
-
         for (std::string line : content) htmlText.emplace_back(FormatHTML(line));
-
         pubFile << HTMLCleanup(std::move(htmlText));
-
         pubFile << HTMLSection(2);
-
         pubFile.close();
-
         SysMsg("html file published successfully - Location: '" + publishedFullPath + "'. FINISHED");        
     }
 };

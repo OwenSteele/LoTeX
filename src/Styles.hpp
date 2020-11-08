@@ -5,19 +5,15 @@
 class Styles
 {
     private: 
-    std::string formattedAttributes;
-    std::string Trim(std::string str)
-    {
-        while (str.substr(0,1) == " ") str = str.substr(1,str.length());
-        while (str.substr(str.length()-1,str.length()) == " ") str = str.substr(0,str.length()-1);
-        return str;
-    }
+    std::string _formattedAttributes;
     void FormatAttribute(std::string&& id, std::string value)
     {
         if(!value.empty())
         {
             if (id.find("_")!= std::string::npos) id.replace(id.find("_"),1,"-");
-            formattedAttributes += id + ": " + Trim(std::move(value)) + ";\n";
+            while (value.substr(0,1) == " ") value = value.substr(1,value.length());
+            while (value.substr(value.length()-1,value.length()) == " ") value = value.substr(0,value.length()-1);
+            _formattedAttributes += id + ": " + value + ";\n";
         }
     }
 
@@ -53,8 +49,8 @@ class Styles
     std::string ReturnCSS()
     {
         std::string sName = (name == "body") ? name : "." + name;
-        if (formattedAttributes.empty()) return "";
-        return sName + " {\n" + formattedAttributes + "}\n";
+        if (_formattedAttributes.empty()) return "";
+        return sName + " {\n" + _formattedAttributes + "}\n";
     }
 };
 
@@ -76,11 +72,11 @@ void AddStyle(std::vector<std::string> attributes)
         ErrMsg(e.what());
     }
 }
-inline Styles normalText ("text","p","black","white","Arial","12");
 void CreateDefaultStyles()
 {
-    if (fileStyles.size() == 0)
+    if (fileStyles.empty())
     { 
+    Styles normalText ("text","p","black","white","Arial","12");
     Styles title ("title","h1","black","white","Arial","32");
     Styles subtitle ("subtitle","h2","black","white","Arial","20");
     Styles redText ("red","p","red","white","Arial","12");
@@ -92,19 +88,14 @@ void CreateDefaultStyles()
     fileStyles.emplace_back(highlightedText);
     }
 }
-bool StyleExists(std::string& styleName)
-{
-    auto it = find_if(fileStyles.begin(), fileStyles.end(), [&styleName](const Styles& obj) {return obj.name == styleName;}); //find if style exists
-    if (it != fileStyles.end()) return true;
-    else return false;                                 
-}
-inline Styles empty ("","","","","","");
 Styles GetStyleByName(std::string styleName)
 {
-    if (StyleExists(styleName))
+    Styles emptyStyle ("","","","","","");
+    auto it = find_if(fileStyles.begin(), fileStyles.end(), [&styleName](const Styles& obj) {return obj.name == styleName;}); //find if style exists
+    if (it != fileStyles.end())
     {
         auto it = find_if(fileStyles.begin(), fileStyles.end(), [&styleName] (const Styles& obj) {return obj.name == styleName;});
         return fileStyles[distance(fileStyles.begin(), it)];
     }
-    else return empty;
+    else return emptyStyle;
 }
