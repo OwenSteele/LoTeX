@@ -2,13 +2,11 @@
 
 Basic compiler-like program to convert plain text into formatted '.html' files.
 
-- Creates, reads and writes '.txt' files as unformatted base text.
-
 - Publishes '.txt' into formatted '.html' with CSS classes.
 
 - Uses assigned '/style' commands, edited with '#style' commands - that determine '.html'/CSS formats
 
-__See Example.txt and Example.html for and example of the programs publish function__
+__See Example.txt and Example.html for and example of the programs publish function and capabilities__
 
 # Getting Started
 
