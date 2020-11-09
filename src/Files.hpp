@@ -121,7 +121,7 @@ class LFile
             lastTag = currentTag;
             currentTag = text[n].substr(0,text[n].find(">"));
 
-            if (currentTag == lastTag && currentTag != "</br>")
+            if (currentTag == lastTag && currentTag != "<br>")
             {
                 text[n-1] = text[n-1].substr(0, text[n-1].find("<",3)) + " </br>\n";
                 text[n] = text[n].substr(text[n].find(">",1)+1,text[n].length());
@@ -216,7 +216,7 @@ class LFile
             std::string lineBeforeClause = line.substr(0,inlineOpenPos);
             std::string inlineClause = InlineStatement(line.substr(inlineOpenPos+1,inlineClosePos-(inlineOpenPos+1)));
             std::string lineAfterClause = line.substr(inlineClosePos+1,line.length());
-            pContent.replace(inlineOpenPos,inlineClosePos, inlineClause);
+            pContent.replace(inlineOpenPos,inlineClosePos-(inlineOpenPos-1), inlineClause);
         }
         return pStart + pContent + pEnd;
     }
