@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include <SrcFiles.h>
 
 using namespace std;
 
@@ -6,10 +7,7 @@ class SampleTest : public ::testing::Test {
 public:
     SampleTest() {};
 
-    void SetUp () override {
-
-    }
-
+    void SetUp () override { }
 };
 
 TEST_F(SampleTest, DeviceIdIsCorrectlySet) {

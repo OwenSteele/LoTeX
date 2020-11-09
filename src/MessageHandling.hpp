@@ -53,19 +53,19 @@ std::string MsgIn()
                 SysMsg("Breakout called.");
                 return "!!BREAK"; 
             } 
-            else if(input != "") validInput=true;
+            else if(!input.empty()) validInput=true;
 
             else std::cout << "ERR, retry << ";
         }while (!validInput);
 
         return input;
     }
-int MsgInInt(std::optional<int>&& options = NULL)
+int MsgInInt(int options = -1)
 {
     do{
         try{
             int input = std::stoi(MsgIn());
-            if (options != NULL)
+            if (options != -1)
             {
                 if (input < options && input > -1) return input;
                 else ErrMsg("Input is outside options range");

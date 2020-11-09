@@ -50,6 +50,7 @@ class Styles
     {
         std::string sName = (name == "body") ? name : "." + name;
         if (_formattedAttributes.empty()) return "";
+        else if (sName != "body" && !background_color.empty()) sName += " span";
         return sName + " {\n" + _formattedAttributes + "}\n";
     }
 };
@@ -92,10 +93,6 @@ Styles GetStyleByName(std::string styleName)
 {
     Styles emptyStyle ("","","","","","");
     auto it = find_if(fileStyles.begin(), fileStyles.end(), [&styleName](const Styles& obj) {return obj.name == styleName;}); //find if style exists
-    if (it != fileStyles.end())
-    {
-        auto it = find_if(fileStyles.begin(), fileStyles.end(), [&styleName] (const Styles& obj) {return obj.name == styleName;});
-        return fileStyles[distance(fileStyles.begin(), it)];
-    }
+    if (it != fileStyles.end()) return fileStyles[distance(fileStyles.begin(), it)];
     else return emptyStyle;
 }

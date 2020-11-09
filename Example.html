@@ -3,57 +3,54 @@
 <head>
 <title>Example</title>
 <style>
-.title {
+body {
 color: black;
 background-color: white;
-font-family: Arial;
-font-size: 32px;
-}
-.text {
-color: black;
-background-color: white;
-font-family: Arial;
+font-family: verdana;
 font-size: 12px;
+text-align: center;
 }
-.subtitle {
-color: black;
-background-color: white;
-font-family: Arial;
-font-size: 20px;
+.title span {
+color: pink;
+background-color: blue;
+font-family: Calibri;
+font-size: 50px;
+text-align: justify;
 }
-.red {
-color: red;
-background-color: white;
-font-family: Arial;
-font-size: 12px;
+.catastrophe span {
+color: orange;
+background-color: purple;
+font-family: comic sans;
+font-size: 15px;
 }
-.highlight {
-color: white;
+.secretstyle span {
+color: green;
+background-color: orange;
+font-family: Times New Roman;
+font-size: 40px;
+text-align: left;
+}
+.alertstyle span {
+color: blue;
 background-color: red;
-font-family: Arial;
-font-size: 12px;
+font-family: comic sans;
+font-size: 100px;
+text-align: justify;
 }
 </style>
 </head>
 <body>
-
-<h1 class="title">Shopping List</h1>
 </br>
-<h2 class="subtitle">Vegetables</h2>
-</br>
-<p class="text">red peppers</p>
-
-<p class="red">tomatoes</p>
-
-<p class="text">babycorn</p>
-
-<p class="highlight">pak choi</p>
-</br>
-<h2 class="subtitle">Fruit</h2>
-</br>
-<p class="text">apples</p>
-</br>
-<p class="highlight">bananas</p>
-
+<h1 class="title"><span>Shopping List</span></h1></br>
+<p>Vegetables </p></br>
+<p>red peppers </br>
+tomatoes </br>
+babycorn </br>
+pak choi <i>'Note: no style yet - but this comment won't be removed, changed to a note.'</i></p></br>
+<p>Fruit</p></br>
+<h4 class="catastrophe"><span>don't forget the grapes!</span></h4></br>
+<h2 class="secretstyle"><span>sweets for me only</span></h2></br>
+<p>bananas</p></br>
+<h1 class="alertstyle"><span>pizza saturday??</span></h1>
 </body>
 </html>

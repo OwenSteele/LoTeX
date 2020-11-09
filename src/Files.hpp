@@ -7,7 +7,7 @@ bool CheckPathExists(const std::filesystem::path& dirPath, std::filesystem::file
     }    
 inline std::string CorrectPathName(std::string& fullPath)
 {
-    if(fullPath.substr(0,1)!="/") return "/" + fullPath;
+    if(fullPath.substr(0,1)!="/" && fullPath.find(":") == std::string::npos) return "/" + fullPath;
     return fullPath;
 }
 void CreateFile(std::string&& fullPath)
@@ -34,7 +34,7 @@ class LFile
         while (getline(exFile, currentLine))
         {
             if (currentLine.find("*||") != std::string::npos)
-                 currentLine.replace(currentLine.find("*||"),3,"'Note: ") += "'"; //adds note around comment
+                 currentLine.replace(currentLine.find("*||"),3,"<i>'Note: ") += "'</i>"; //adds note around comment
             else if (currentLine.find("||") != std::string::npos) 
                 currentLine = currentLine.substr(0, currentLine.find("||"));
           
@@ -109,7 +109,7 @@ class LFile
     static std::string HTMLCleanup(std::vector<std::string> text)
     {
         std::string html;
-        std::string currentTag = "";
+        std::string currentTag;
         std::string lastTag;
         for (int n = 0; n < text.size(); n++) 
         {
@@ -155,7 +155,7 @@ class LFile
     }
     static std::string FormatHTML(std::string& line)
     {
-        if (line.empty()) return "</br>";
+        if (line.empty()) return "<br>";
 
         std::string styleName;
         std::string pStart;
@@ -169,8 +169,13 @@ class LFile
         if (!s.name.empty())
         {
             pStart = "\n<" + s.element + " class=\"" + s.name + "\"" + ">";
+            if (!s.background_color.empty())
+            {
+                pStart += "<span>";
+                pEnd = "</span>";
+            }
             pContent = line.substr(line.find(" ",1)+1, line.length());
-            pEnd = "</" + s.element + ">";
+            pEnd += "</" + s.element + ">";
         }
         else if (s.name.empty() && line.substr(0,1) == "/")
         { 
@@ -183,6 +188,15 @@ class LFile
             pStart = "\n<p>";
             pContent = line;
             pEnd = "</p>";
+        }
+        if(line.find("{") != std::string::npos && line.find("}",1) != std::string::npos)
+        {
+            int inlineOpenPos = line.find("{");
+            int inlineClosePos = line.find("}",1);
+            if (inlineOpenPos <= inlineClosePos) return pStart + pContent + pEnd;
+            std::string lineBeforeClause = line.substr(0,inlineOpenPos-1);
+            std::string inlineClause = line.substr(inlineOpenPos+1,inlineClosePos-1);
+            std::string lineAfterClause = line.substr(inlineClosePos+1,line.length());
         }
         return pStart + pContent + pEnd;
     }
@@ -208,7 +222,6 @@ class LFile
         else
         {
             SysMsg("Existing file found - overwriting.");
-            std::ofstream pubFile; 
             pubFile.open (publishedFullPath,  std::ofstream::out | std::ofstream::trunc);
             pubFile.close();
         }

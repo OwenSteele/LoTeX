@@ -1,14 +1,26 @@
+#styles ||these are where you put your styles
+/default black,white, verdana, 12, center ||sets the style for all lines without a style - and elements missing in styles
+/title h1,pink,blue, Calibri, 50, justify
+/secretstyle h2,green, orange, Times New Roman ,40, left
+/alertstyle h1,blue,red,comic sans,100,justify
+/catastrophe h4,orange,purple,comic sans, 15
+#endstyles
+
 /title Shopping List
 
-/subtitle Vegetables
+/subtitle Vegetables ||no style added yet
 
 red peppers
 /red tomatoes
 babycorn
-/highlight pak choi
+/highlight pak choi *||no style yet - but this comment won't be removed, changed to a note.
 
 /subtitle Fruit
 
-apples
+/catastrophe don't forget the grapes!
+
+/secretstyle sweets for me only
 
 /highlight bananas
+
+/alertstyle pizza saturday??

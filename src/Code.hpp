@@ -3,11 +3,12 @@
 void Menu(std::unordered_map<int, std::pair<std::function<void()>, std::string>> dict, const std::string&& functionName = "")
 {
 	std::cout << "\n__" << functionName << "() Menu__\n";
-	for (auto it : dict) std::cout <<"   " << it.first << " - " << it.second.second << std::endl;
+	for (const auto& it : dict) std::cout <<"   " << it.first << " - " << it.second.second << std::endl;
 	std::cout << "Press a key and press enter";
 
-	do{		
-		auto option = dict.find(MsgInInt());
+	do{
+	    int&& x =MsgInInt();
+		auto option = dict.find(x);
 		if (option != dict.end()) return option->second.first();
 		else ErrMsg("Invalid input, please try again");
 	} while (true);
@@ -18,7 +19,7 @@ int SelectStylesType()
 			"0: Default Styles",
 			"1: Styles included in file",
 			"2: Styles listed in separate file"};
-	for(auto option : options) std::cout << option << std::endl;
+	for(const auto& option : options) std::cout << option << std::endl;
 
 	return MsgInInt(options.size());			
 }
@@ -34,7 +35,13 @@ LFile GetFile()
 			else fullPath= temp;
 			
 			//temp debugging
-			if (fullPath == "./") fullPath = "/home/owen/Desktop/test.txt";
+            #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+			if (fullPath == "./") fullPath = "c:/Users/owenf/source/repos/LoTex/Example.txt";
+            #elif __linux__
+            if (fullPath == "./") fullPath = "/home/owen/Desktop/test.txt";
+            #else
+
+            #endif
 
 			fullPath = CorrectPathName(fullPath);
 			if (CheckPathExists(fullPath)) break;
