@@ -15,6 +15,9 @@ void CreateFile(std::string&& fullPath)
     std::ofstream outFile (fullPath, std::ios_base::app);
     outFile.close();
 }
+inline static std::unordered_map<std::string, std::vector<std::string>> builtinInlineStatements {
+        {"link", {"<a href=\"","\">","</a>"}}
+};
 
 class LFile
 {
@@ -153,6 +156,22 @@ class LFile
         } //create add new style option here?
         return formattedLine;
     }
+    static std::string InlineStatement(const std::string& statement)
+    {
+        std::string functionName = statement.substr(0, statement.find(" "));
+        std::string content = statement.substr(statement.find(" ")+1,statement.length());
+        std::string result;
+        auto stmt = builtinInlineStatements.find(functionName);
+        if (stmt != builtinInlineStatements.end())
+        {
+            result += stmt->second[0];
+            result += content.substr(content.find(",")+1,content.length());
+            result += stmt->second[1];
+            result += content.substr(0,content.find(","));
+            result += stmt->second[2];
+        }
+        return result;
+    }
     static std::string FormatHTML(std::string& line)
     {
         if (line.empty()) return "<br>";
@@ -193,10 +212,11 @@ class LFile
         {
             int inlineOpenPos = line.find("{");
             int inlineClosePos = line.find("}",1);
-            if (inlineOpenPos <= inlineClosePos) return pStart + pContent + pEnd;
-            std::string lineBeforeClause = line.substr(0,inlineOpenPos-1);
-            std::string inlineClause = line.substr(inlineOpenPos+1,inlineClosePos-1);
+            if (inlineOpenPos >= inlineClosePos) return pStart + pContent + pEnd;
+            std::string lineBeforeClause = line.substr(0,inlineOpenPos);
+            std::string inlineClause = InlineStatement(line.substr(inlineOpenPos+1,inlineClosePos-(inlineOpenPos+1)));
             std::string lineAfterClause = line.substr(inlineClosePos+1,line.length());
+            pContent.replace(inlineOpenPos,inlineClosePos, inlineClause);
         }
         return pStart + pContent + pEnd;
     }
