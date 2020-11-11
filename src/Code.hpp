@@ -1,18 +1,18 @@
 #include "SrcFiles.h"
 
-void Menu(std::unordered_map<int, std::pair<std::function<void()>, std::string>> dict, const std::string&& functionName = "")
-{
-	std::cout << "\n__" << functionName << "() Menu__\n";
-	for (const auto& it : dict) std::cout <<"   " << it.first << " - " << it.second.second << std::endl;
-	std::cout << "Press a key and press enter";
-
-	do{
-	    int&& x =MsgInInt();
-		auto option = dict.find(x);
-		if (option != dict.end()) return option->second.first();
-		else ErrMsg("Invalid input, please try again");
-	} while (true);
-}
+//void Menu(std::unordered_map<int, std::pair<std::function<void()>, std::string>> dict, const std::string&& functionName = "")
+//{
+//	std::cout << "\n__" << functionName << "() Menu__\n";
+//	for (const auto& it : dict) std::cout <<"   " << it.first << " - " << it.second.second << std::endl;
+//	std::cout << "Press a key and press enter";
+//
+//	do{
+//	    int&& x =MsgInInt();
+//		auto option = dict.find(x);
+//		if (option != dict.end()) return option->second.first();
+//		else ErrMsg("Invalid input, please try again");
+//	} while (true);
+//}
 int SelectStylesType()
 {
 	const std::vector<std::string> options {"File Styles - Select one of the options:",
@@ -21,7 +21,7 @@ int SelectStylesType()
 			"2: Styles listed in separate file"};
 	for(const auto& option : options) std::cout << option << std::endl;
 
-	return MsgInInt(options.size());			
+	return MsgInInt(options.size());
 }
 LFile GetFile()
 {
@@ -35,14 +35,9 @@ LFile GetFile()
 			else fullPath= temp;
 			
 			//temp debugging
-            #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-			if (fullPath == "./") fullPath = "c:/Users/owenf/source/repos/LoTex/Example.txt";
-            #elif __linux__
-            if (fullPath == "./") fullPath = "/home/owen/Desktop/test.txt";
-            #else
 
-            #endif
-
+			if (fullPath == "./" && steel::IsWindowsOS()) fullPath = "c:/Users/owenf/source/repos/LoTex/Example.txt";
+            if (fullPath == "./"&& !steel::IsWindowsOS()) fullPath = "/home/owen/Desktop/test.txt";
 			fullPath = CorrectPathName(fullPath);
 			if (CheckPathExists(fullPath)) break;
 			else ErrMsg("Not found, try again - ");
@@ -62,10 +57,7 @@ void FilePublish()
 void CodeMain()
 {
 	while(!exitCalled){
-    	std::unordered_map<int, std::pair<std::function<void()>, std::string>> newMenu;
-		newMenu.insert(std::make_pair(0, std::make_pair(&Exit, "Exit")));
-		newMenu.insert(std::make_pair(1, std::make_pair(&FilePublish, "Publish")));
-		Menu(newMenu, __FUNCTION__);
+		steel::Menu({{&Exit,"Exit"},{&FilePublish, "Publish Existing File"}}, __FUNCTION__)();
 	}
 	exit(0);
 }  

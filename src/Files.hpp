@@ -123,7 +123,7 @@ class LFile
 
             if (currentTag == lastTag && currentTag != "<br>")
             {
-                text[n-1] = text[n-1].substr(0, text[n-1].find("<",3)) + " </br>\n";
+                text[n-1] = text[n-1].substr(0, text[n-1].find("<",3)) + " <br>\n";
                 text[n] = text[n].substr(text[n].find(">",1)+1,text[n].length());
             }
         }
@@ -232,7 +232,7 @@ class LFile
     {
         std::string&& publishedFullPath = path +"/"+ name.substr(0,name.rfind(".")) + ".html";
         std::vector<std::string> htmlText;
-        std::ofstream pubFile; 
+        std::ofstream pubFile;
                  
         if(!CheckPathExists(publishedFullPath))
         {

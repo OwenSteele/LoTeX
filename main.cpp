@@ -7,6 +7,6 @@ int main() {
     std::cout << "   For help 'type #h" << std::endl << std::endl;
 
     CodeMain();
-    
+
     return 0;
 }

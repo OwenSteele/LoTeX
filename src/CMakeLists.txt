@@ -9,7 +9,7 @@ set(HEADER_FILES
 
 set(SOURCE_FILES
 main.cpp
-)
+       )
 
 if (EXISTS ${SOURCE_FILES})
     # The library contains header and source files.

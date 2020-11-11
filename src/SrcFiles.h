@@ -20,6 +20,7 @@
 #include <sys/types.h>
 #include <vector>
 #include <chrono>
+#include "steel.h"
 
 #include "MessageHandling.hpp"
 #include "Styles.hpp"

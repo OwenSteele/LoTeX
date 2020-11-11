@@ -7,22 +7,10 @@ void CodeMain();
 
 void Exit() { exitCalled = true; }
 
-std::string GetTime()
-{
-    time_t rawTime;
-    struct tm * timeinfo;
-    char buffer[80];
-    time(&rawTime);
-    timeinfo = localtime(&rawTime);
-    strftime(buffer,sizeof(buffer), "%H:%M:%S", timeinfo);
-    std::string str(buffer);
-    return str;
-}
-
-void ErrMsg(std::string&& message) { 
-    std::cout << "      --!ERR >> '" << message << "' " << GetTime() << std::endl; }
-void SysMsg(std::string&& message) {
-    std::cout << "      --!SYS >> '" << message << "' " << GetTime()<< std::endl; }
+static void ErrMsg(std::string&& message) {
+    std::cout << "      --!ERR >> '" << message << "' " << steel::GetTime() << std::endl; }
+static void SysMsg(std::string&& message) {
+    std::cout << "      --!SYS >> '" << message << "' " << steel::GetTime()<< std::endl; }
 
 std::string MsgIn()
     {
@@ -64,8 +52,7 @@ int MsgInInt(int options = -1)
 {
     do{
         try{
-            int input = std::stoi(MsgIn());
-            if (options != -1)
+            if (int input = std::stoi(MsgIn()); options != -1)
             {
                 if (input < options && input > -1) return input;
                 else ErrMsg("Input is outside options range");

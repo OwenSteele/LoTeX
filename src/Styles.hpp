@@ -11,9 +11,9 @@ class Styles
         if(!value.empty())
         {
             if (id.find("_")!= std::string::npos) id.replace(id.find("_"),1,"-");
-            while (value.substr(0,1) == " ") value = value.substr(1,value.length());
-            while (value.substr(value.length()-1,value.length()) == " ") value = value.substr(0,value.length()-1);
+            steel::Trim(value);
             _formattedAttributes += id + ": " + value + ";\n";
+
         }
     }
 
