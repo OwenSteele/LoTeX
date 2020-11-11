@@ -33,16 +33,21 @@ class LFile
         std::vector<std::string> content;
         std::string currentLine;
         std::ifstream exFile;
+        bool emptyCommentLine;
+        bool stylesRegionEnded = false;
 
 	    exFile.open (fullPath, std::ios_base::app);
         while (getline(exFile, currentLine))
         {
+            emptyCommentLine = false;
             if (currentLine.find("*||") != std::string::npos)
                  currentLine.replace(currentLine.find("*||"),3,"<i>'Note: ") += "'</i>"; //adds note around comment
-            else if (currentLine.find("||") != std::string::npos) 
+            if (currentLine.find("||") != std::string::npos) {
                 currentLine = currentLine.substr(0, currentLine.find("||"));
-          
-            content.emplace_back(currentLine);
+            }
+            if (currentLine.find("#endstyles") != std::string::npos) stylesRegionEnded = true;
+            if (currentLine.empty() && !stylesRegionEnded) emptyCommentLine = true;
+            if(!emptyCommentLine) content.emplace_back(currentLine);
         }
 	    exFile.close();
 

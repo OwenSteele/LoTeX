@@ -1,0 +1,36 @@
+||     LoTeX, by Owen Steele 2020.
+
+|| comments are made using '||' - these will not be included in the published file.
+||      To have comments included in the published file as notes, '*||' will have the comment included as: 'Note: '.
+
+|| For custom styles, a styles region must be included at the top of the file, with opening '#styles', and closing '#endstyles'.
+||      To define a style in this region, type '/[style name] [html element],[color],[background colour], [font family], [font size], [alignment]'
+||      Leaving a field black, e.g. '/myStyle h1,black,,arial...', will rely on the default style.
+||      To create the default style type '/default' and the style name, default styles do NOT have an element (first attributes is 'color')..
+||      After the '#endstyles' line, the text to be translated to html begins.
+
+|| To set a line to a defined style, start the line with '/[defined style name]', '/default' tags will be removed.
+||      If the style written is not defined, the tag will be removed and set to the default style instead.
+
+|| Inline code can also be defined with '{ }', this will add in elements in the same line.
+||      Currently two inline statements exist, for links and images.
+||      Syntax: {[defined statement name] [text for link/image description],[path directory or full URL]}.
+||      E.g. '{link click here, https://owensteele.co.uk}' and '{image this is me, C:/pictures/photo_of_me.jpg}'.
+
+|| Be careful as spaces ' ' and newlines are important for syntax.
+
+|| Below is a template to help you get started. Once it is ready, launch LoTeX and select publish!
+
+#styles
+/default black, white, verdana, 14, left
+/title h1,green,black, lucinda console, 24, centre
+/myStyle p,red,,, 18, justify
+#endstyles
+
+/title Template
+
+This is some sample text, for another example, see 'Example.txt' and published 'Example.html' files.
+Comments to the right will not be included in the published file ||you won't see me in the html file!
+But noted comments will appear: *|| this is a note for the html file.
+
+/myStyle Lines can have both a style and an inline statement, {link like this!, https://owensteele.co.uk}.
