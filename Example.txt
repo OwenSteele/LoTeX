@@ -6,7 +6,7 @@
 /catastrophe h4,orange,purple,comic sans, 15
 #endstyles
 
-/title Shopping List
+/title Shopping List1
 
 /subtitle Vegetables ||no style added yet
 
@@ -17,7 +17,8 @@ babycorn
 
 /subtitle Fruit
 
-/catastrophe don't forget the grapes!
+/catastrophe don't forget the {image ,c:/Users/owenf/source/repos/LoTex/grapes.jpg} grapes!
+{image ,c:/Users/owenf/source/repos/LoTex/grapes.jpg}
 
 /secretstyle sweets for me only
 

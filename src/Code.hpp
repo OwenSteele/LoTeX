@@ -1,18 +1,4 @@
 #include "SrcFiles.h"
-
-//void Menu(std::unordered_map<int, std::pair<std::function<void()>, std::string>> dict, const std::string&& functionName = "")
-//{
-//	std::cout << "\n__" << functionName << "() Menu__\n";
-//	for (const auto& it : dict) std::cout <<"   " << it.first << " - " << it.second.second << std::endl;
-//	std::cout << "Press a key and press enter";
-//
-//	do{
-//	    int&& x =MsgInInt();
-//		auto option = dict.find(x);
-//		if (option != dict.end()) return option->second.first();
-//		else ErrMsg("Invalid input, please try again");
-//	} while (true);
-//}
 int SelectStylesType()
 {
 	const std::vector<std::string> options {"File Styles - Select one of the options:",

@@ -16,7 +16,8 @@ void CreateFile(std::string&& fullPath)
     outFile.close();
 }
 inline static std::unordered_map<std::string, std::vector<std::string>> builtinInlineStatements {
-        {"link", {"<a href=\"","\">","</a>"}}
+        {"link", {"<a href=\"","\">","</a>"}},
+        {"image", {"<img src=\"","\" alt=\"","\">"}}
 };
 
 class LFile
@@ -78,7 +79,7 @@ class LFile
             CreateDefaultStyles();
         }
         else
-        {            
+        {
             for(std::string line : styleLines)
             {
                 std::vector<std::string> newStyle;
@@ -114,8 +115,17 @@ class LFile
         std::string html;
         std::string currentTag;
         std::string lastTag;
-        for (int n = 0; n < text.size(); n++) 
+        for (int n = 0; n < text.size(); n++)
         {
+            if (text[n].empty())
+            {
+                text.erase(text.begin() +n);
+                break;
+            }
+            if (int pos = text[n].find("\n\n"); pos != std::string::npos)
+            {
+                text[n].replace(pos,1, "");
+            }
             if (text[n].find(">") == std::string::npos) break;
 
             lastTag = currentTag;
@@ -123,7 +133,7 @@ class LFile
 
             if (currentTag == lastTag && currentTag != "<br>")
             {
-                text[n-1] = text[n-1].substr(0, text[n-1].find("<",3)) + " <br>\n";
+                text[n-1] = text[n-1].substr(0, text[n-1].find("<",3)) + "\n<br>";
                 text[n] = text[n].substr(text[n].find(">",1)+1,text[n].length());
             }
         }
@@ -136,11 +146,11 @@ class LFile
         std::shared_ptr<std::vector<Styles>> styles = std::make_shared<std::vector<Styles>>(GetFileStyles());
         std::string formattedLine;
         std::string styleName;
-            
+
         if (line.substr(0,1) != "/") styleName = "empty";
         else styleName = line.substr(1,line.find(" ",1)-1);
-        
-        if (styleName == "default") styleName = "empty";        
+
+        if (styleName == "default") styleName = "empty";
         Styles s = GetStyleByName(styleName);
         if (!s.name.empty())
         {
@@ -150,13 +160,13 @@ class LFile
                  [&currentStyleName] (const std::string& eS) {return eS == currentStyleName;});
             if (it == existingStyles.end())
             {
-                existingStyles.emplace_back(currentStyleName);                        
+                existingStyles.emplace_back(currentStyleName);
                 formattedLine = s.ReturnCSS();
             }
         } //create add new style option here?
         return formattedLine;
     }
-    static std::string InlineStatement(const std::string& statement)
+    static inline std::string InlineStatement(const std::string& statement)
     {
         std::string functionName = statement.substr(0, statement.find(" "));
         std::string content = statement.substr(statement.find(" ")+1,statement.length());
@@ -164,23 +174,23 @@ class LFile
         auto stmt = builtinInlineStatements.find(functionName);
         if (stmt != builtinInlineStatements.end())
         {
-            result += stmt->second[0];
-            result += content.substr(content.find(",")+1,content.length());
-            result += stmt->second[1];
-            result += content.substr(0,content.find(","));
-            result += stmt->second[2];
+            result = stmt->second[0] +
+                content.substr(content.find(",")+1,content.length()) +
+                stmt->second[1] +
+                content.substr(0,content.find(",")) +
+                stmt->second[2];
         }
         return result;
     }
     static std::string FormatHTML(std::string& line)
     {
-        if (line.empty()) return "<br>";
+        if (line.empty()) return "\n<br>";
 
         std::string styleName;
         std::string pStart;
         std::string pContent;
         std::string pEnd;
-            
+
         if (line.substr(0,1) == "/") styleName = line.substr(1,line.find(" ",1)-1);
         else styleName = "empty";
         Styles s = GetStyleByName(styleName);
@@ -197,12 +207,12 @@ class LFile
             pEnd += "</" + s.element + ">";
         }
         else if (s.name.empty() && line.substr(0,1) == "/")
-        { 
+        {
             pStart = "\n<p>";
             pContent = line.substr(line.find(" ",1)+1, line.length());
             pEnd = "</p>";
         }
-        else
+        else if (line.substr(0,1) != "{")
         {
             pStart = "\n<p>";
             pContent = line;
@@ -216,9 +226,9 @@ class LFile
             std::string lineBeforeClause = line.substr(0,inlineOpenPos);
             std::string inlineClause = InlineStatement(line.substr(inlineOpenPos+1,inlineClosePos-(inlineOpenPos+1)));
             std::string lineAfterClause = line.substr(inlineClosePos+1,line.length());
-            pContent.replace(inlineOpenPos,inlineClosePos-(inlineOpenPos-1), inlineClause);
+            pContent = lineBeforeClause + inlineClause + lineAfterClause;
         }
-        return pStart + pContent + pEnd;
+        return "\n" + pStart + pContent + pEnd;
     }
     public:
     explicit LFile(std::string& fullPath, bool newFile = false)
@@ -233,7 +243,7 @@ class LFile
         std::string&& publishedFullPath = path +"/"+ name.substr(0,name.rfind(".")) + ".html";
         std::vector<std::string> htmlText;
         std::ofstream pubFile;
-                 
+
         if(!CheckPathExists(publishedFullPath))
         {
              CreateFile(std::forward<std::string&&>(publishedFullPath));
@@ -283,6 +293,6 @@ class LFile
         pubFile << HTMLCleanup(std::move(htmlText));
         pubFile << HTMLSection(2);
         pubFile.close();
-        SysMsg("html file published successfully - Location: '" + publishedFullPath + "'. FINISHED");        
+        SysMsg("html file published successfully - Location: '" + publishedFullPath + "'. FINISHED");
     }
 };
