@@ -174,15 +174,15 @@ class LFile
     static inline std::string InlineStatement(const std::string& statement)
     {
         std::string functionName = statement.substr(0, statement.find(" "));
-        std::string content = statement.substr(statement.find(" ")+1,statement.length());
+        std::string _content = statement.substr(statement.find(" ")+1,statement.length());
         std::string result;
         auto stmt = builtinInlineStatements.find(functionName);
         if (stmt != builtinInlineStatements.end())
         {
             result = stmt->second[0] +
-                content.substr(content.find(",")+1,content.length()) +
+                _content.substr(_content.find(",")+1,_content.length()) +
                 stmt->second[1] +
-                content.substr(0,content.find(",")) +
+                _content.substr(0,_content.find(",")) +
                 stmt->second[2];
         }
         return result;
