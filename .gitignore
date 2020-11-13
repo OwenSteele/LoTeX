@@ -4,3 +4,4 @@ cmake-build-debug
 tests/lib
 build
 .vscode/
+.vs
