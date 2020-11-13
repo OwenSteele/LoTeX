@@ -236,12 +236,14 @@ class LFile
         return "\n" + pStart + pContent + pEnd;
     }
     public:
-    explicit LFile(std::string& fullPath, bool newFile = false)
+    explicit LFile(std::string& fullPath)
     {
         int&& lastSlashPos = fullPath.rfind("/");
-        path = CorrectPathName(fullPath).substr(0,lastSlashPos);
-        name = fullPath.substr(lastSlashPos+1,fullPath.length()-lastSlashPos); //name = after last '/' in path
-        if(!newFile) content = GetFileContent(fullPath);
+        if (lastSlashPos != std::string::npos) {
+            path = CorrectPathName(fullPath).substr(0, lastSlashPos);
+            name = fullPath.substr(lastSlashPos + 1, fullPath.length() - lastSlashPos); //name = after last '/' in path
+            if (CheckPathExists(fullPath)) content = GetFileContent(fullPath);
+        }
     }
     void Publish(int styleInclusionType = 0)
     {

@@ -10,8 +10,14 @@ public:
     void SetUp () override { }
 };
 
-TEST_F(SampleTest, DeviceIdIsCorrectlySet) {
-    auto const expected = 2;
-    auto const result = 1 + 1;
-    EXPECT_EQ(expected, result);
+TEST_F(SampleTest, LFileObjectInit) {
+    std::string path = "c:/Users/owenf/documents/createTest.txt";
+    std::string expectedName = "createTest.txt";
+    std::string expectedPath = "c:/Users/owenf/documents";
+
+    LFile testFile(path, true);
+    ASSERT_TRUE(expectedName == testFile.name);
+    ASSERT_TRUE(expectedPath == testFile.path);
 }
+
+

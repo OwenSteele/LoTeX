@@ -16,24 +16,29 @@ inline std::string FileInfo(bool pathOnly = false)
         if (pathOnly) std::cout << "Enter path only";
         else std::cout << "Enter file name and path";
         std::string temp = MsgIn();
-        if (temp == "!!BREAK") CodeMain();
-        else fullPath= temp;
-        //temp debugging
-        if (pathOnly) {
-            if (fullPath == "./" && steel::IsWindowsOS()) fullPath = "c:/Users/owenf/source/repos/LoTex";
-            else if (fullPath == "./" && !steel::IsWindowsOS()) fullPath = "/home/owen/Desktop";
+        if (temp != "!!BREAK") {
+            fullPath = temp;
+            //temp debugging
 
-            if (fullPath.rfind("/") > (fullPath.rfind(".") != std::string::npos) ? fullPath.rfind(".") : fullPath.rfind("/") + 1)
-                fullPath.substr(fullPath.rfind("/"));
-        }
-        else{
-            if (fullPath == "./" && steel::IsWindowsOS()) fullPath = "c:/Users/owenf/source/repos/LoTex/Example.txt";
-            else if (fullPath == "./" && !steel::IsWindowsOS()) fullPath = "/home/owen/Desktop/test.txt";
-        }
+            if (pathOnly) {
+                if (fullPath == "./" && steel::IsWindowsOS()) fullPath = "c:/Users/owenf/source/repos/LoTex";
+                else if (fullPath == "./" && !steel::IsWindowsOS()) fullPath = "/home/owen/Desktop";
 
-        fullPath = CorrectPathName(fullPath);
-        if (CheckPathExists(fullPath)) break;
-        else ErrMsg("Not found, try again - ");
+                if (fullPath.rfind("/") > (fullPath.rfind(".") != std::string::npos) ? fullPath.rfind(".") :
+                    fullPath.rfind("/") + 1)
+                    fullPath.substr(fullPath.rfind("/"));
+            } else {
+                if (fullPath == "./" && steel::IsWindowsOS())
+                    fullPath = "c:/Users/owenf/source/repos/LoTex/Example.txt";
+                else if (fullPath == "./" && !steel::IsWindowsOS()) fullPath = "/home/owen/Desktop/test.txt";
+            }
+
+            fullPath = CorrectPathName(fullPath);
+            if (CheckPathExists(fullPath)) break;
+            else ErrMsg("Not found, try again - ");
+        }
+        else break;
+
     } while (true);
 
     return fullPath;
@@ -92,11 +97,10 @@ void FilePublish()
 }
 void CodeMain()
 {
-	while(!exitCalled){
+	while(exitCalled){
 		steel::Menu({{&Exit,"Exit"},
                {&FilePublish, "Publish Existing File"},
                {&CreateTemplateFile, "Create a template file"}}
                , __FUNCTION__)();
 	}
-	exit(0);
 }  

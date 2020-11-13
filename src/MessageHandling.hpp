@@ -42,7 +42,6 @@ std::string MsgIn()
                 return "!!BREAK"; 
             } 
             else if(!input.empty()) validInput=true;
-
             else std::cout << "ERR, retry << ";
         }while (!validInput);
 
